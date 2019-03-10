@@ -1,4 +1,4 @@
-package com.genx.javadoc.test;
+package com.genx.javadoc.utils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -12,7 +12,7 @@ import java.util.List;
  * @author: genx
  * @date: 2019/2/22 0:18
  */
-public class JavaDocUtil {
+public class FileUtil {
 
     public static List<File> listFiles(File dir, FileFilter fileFilter, boolean includeSubDirectories) {
         List<File> result = new ArrayList<>(1024);

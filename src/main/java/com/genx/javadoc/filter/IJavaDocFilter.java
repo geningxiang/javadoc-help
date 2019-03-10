@@ -1,5 +1,6 @@
 package com.genx.javadoc.filter;
 
+import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.MethodDoc;
 
 /**
@@ -7,9 +8,12 @@ import com.sun.javadoc.MethodDoc;
  * Description:
  *
  * @author: genx
- * @date: 2019/3/8 17:28
+ * @date: 2019/3/9 10:56
  */
-public interface IMethodDocFilter {
+public interface IJavaDocFilter {
+
+    boolean accept(ClassDoc classDoc);
 
     boolean accept(MethodDoc methodDoc);
+
 }

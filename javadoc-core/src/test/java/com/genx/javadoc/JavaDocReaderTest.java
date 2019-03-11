@@ -27,7 +27,7 @@ public class JavaDocReaderTest {
             @Override
             public boolean accept(ClassDoc classDoc) {
                 return JavaDocUtil.hasAnnotation(classDoc, "org.springframework.web.bind.annotation.RestController")
-                        || JavaDocUtil.hasAnnotation(classDoc, "org.springframework.web.bind.annotation.Controller");
+                        || JavaDocUtil.hasAnnotation(classDoc, "org.springframework.stereotype.Controller");
             }
 
             @Override
@@ -36,9 +36,9 @@ public class JavaDocReaderTest {
             }
         };
 
-        JavaDocReader.read(new File("D:\\idea-workspace\\Automate2\\automate-web\\src\\main\\java"),
-                new File("D:\\idea-workspace\\Automate2\\automate-web\\target\\Automate2\\WEB-INF\\classes"),
-                new File("D:\\idea-workspace\\Automate2\\automate-web\\target\\Automate2\\WEB-INF\\lib"),
+        JavaDocReader.read(new File("E:\\idea_workspace\\javadoc-help\\javadoc-demo\\src\\main\\java"),
+                new File("E:\\idea_workspace\\javadoc-help\\javadoc-demo\\target\\javadoc-demo\\WEB-INF\\classes"),
+                new File("E:\\idea_workspace\\javadoc-help\\javadoc-demo\\target\\javadoc-demo\\WEB-INF\\lib"),
                 classDocFilter);
     }
 }

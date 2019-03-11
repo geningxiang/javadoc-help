@@ -1,6 +1,7 @@
 package com.genx.javadoc.reader;
 
 import com.sun.javadoc.AnnotationDesc;
+import com.sun.javadoc.AnnotationTypeElementDoc;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,13 +29,31 @@ public class AnnotationDescReader {
             String[] ss = new String[array.length];
             for (int i = 0; i < array.length; i++) {
                 ss[i] = String.valueOf(array[i]);
-                System.out.println(array[i].getClass());
-                System.out.println(array[i]);
-                if(array[i] instanceof String){
+                if(ss[i].startsWith("\"") && ss[i].endsWith("\"")){
                     ss[i] = ss[i].substring(1, ss[i].length() - 1);
                 }
             }
             data.put(elementValuePair.element().name(), ss);
+        }
+
+        for (AnnotationTypeElementDoc element : annotationDesc.annotationType().elements()) {
+            if(!data.containsKey(element.name()) && element.defaultValue().value() != null){
+                Object[] array;
+                if(element.defaultValue().value().getClass().isArray()){
+                    array = (Object[]) element.defaultValue().value();
+                }else {
+                    array = new Object[]{element.defaultValue().value()};
+                }
+                String[] ss = new String[array.length];
+                for (int i = 0; i < array.length; i++) {
+                    ss[i] = String.valueOf(array[i]);
+                    if(ss[i].startsWith("\"") && ss[i].endsWith("\"")){
+                        ss[i] = ss[i].substring(1, ss[i].length() - 1);
+                    }
+                }
+                data.put(element.name(), ss);
+
+            }
         }
 
     }

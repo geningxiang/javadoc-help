@@ -3,14 +3,14 @@ package com.genx.javadoc;
 import com.genx.javadoc.filter.IJavaDocFilter;
 import com.genx.javadoc.parse.JavaDocSpringMvcControllerParser;
 import com.genx.javadoc.utils.FileUtil;
+import com.genx.javadoc.vo.ClassDocVO;
 import com.sun.deploy.util.StringUtils;
+import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.LanguageVersion;
 import com.sun.javadoc.RootDoc;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,10 +33,16 @@ public class JavaDocReader {
             return true;
         }
     }
-    public synchronized static void read(File sourceDir, File classesDir, File libDir, IJavaDocFilter javaDocFilter){
+    public synchronized static Map<String, ClassDocVO> read(File sourceDir, File classesDir, File libDir){
         javadocExecute(sourceDir, classesDir, libDir);
-        JavaDocSpringMvcControllerParser javaDocSpringMvcControllerParser = new JavaDocSpringMvcControllerParser(root, javaDocFilter );
-        javaDocSpringMvcControllerParser.parse();
+        Map<String, ClassDocVO> map = new HashMap(1024);
+        ClassDoc[] classes = root.classes();
+        for (ClassDoc c : classes) {
+            ClassDocVO classDocVO = new ClassDocVO(c);
+            map.put(classDocVO.getClassName(), classDocVO);
+        }
+        return map;
+
     }
 
     private static void javadocExecute(File sourceDir, File classesDir, File libDir){

@@ -42,6 +42,9 @@ public class AnnotationUtil {
         Object[] array;
         if(value.getClass().isArray()){
             array = (Object[]) value;
+            if(array.length == 0){
+                return null;
+            }
         } else {
             array = new Object[]{value};
         }

@@ -1,8 +1,6 @@
 package com.genx.javadoc.vo;
 
 import com.genx.javadoc.utils.AnnotationUtil;
-import com.sun.deploy.util.StringUtils;
-import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.MethodDoc;
 
@@ -23,7 +21,7 @@ public class ClassDocVO {
 
     private String rawCommentText;
 
-    private Map<String, AnnotationVO> annotationMap;
+    private Map<String, AnnotationVO> annotations;
 
     private List<MethodDocVO> methods;
 
@@ -31,7 +29,7 @@ public class ClassDocVO {
         this.className = classDoc.qualifiedTypeName();
         this.rawCommentText = classDoc.getRawCommentText();
 
-        this.annotationMap = AnnotationUtil.readAnnotationMap(classDoc);
+        this.annotations = AnnotationUtil.readAnnotationMap(classDoc);
 
         MethodDoc[] methodDocs = classDoc.methods(false);
         this.methods = new ArrayList<>(methodDocs.length);
@@ -48,8 +46,8 @@ public class ClassDocVO {
         return rawCommentText;
     }
 
-    public Map<String, AnnotationVO> getAnnotationMap() {
-        return annotationMap;
+    public Map<String, AnnotationVO> getAnnotations() {
+        return annotations;
     }
 
     public List<MethodDocVO> getMethods() {

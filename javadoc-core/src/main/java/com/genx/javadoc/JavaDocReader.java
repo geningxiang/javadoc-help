@@ -1,10 +1,8 @@
 package com.genx.javadoc;
 
-import com.genx.javadoc.filter.IJavaDocFilter;
-import com.genx.javadoc.parse.JavaDocSpringMvcControllerParser;
 import com.genx.javadoc.utils.FileUtil;
+import com.genx.javadoc.utils.StringUtils;
 import com.genx.javadoc.vo.ClassDocVO;
-import com.sun.deploy.util.StringUtils;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.LanguageVersion;
 import com.sun.javadoc.RootDoc;
@@ -33,7 +31,8 @@ public class JavaDocReader {
             return true;
         }
     }
-    public synchronized static Map<String, ClassDocVO> read(File sourceDir, File classesDir, File libDir){
+
+    public synchronized static Map<String, ClassDocVO> read(File sourceDir, File classesDir, File libDir) {
         javadocExecute(sourceDir, classesDir, libDir);
         Map<String, ClassDocVO> map = new HashMap(1024);
         ClassDoc[] classes = root.classes();
@@ -45,11 +44,11 @@ public class JavaDocReader {
 
     }
 
-    private static void javadocExecute(File sourceDir, File classesDir, File libDir){
+    private static void javadocExecute(File sourceDir, File classesDir, File libDir) {
         List<String> classPathes = new ArrayList(1024);
 //        classPathes.add("D:\\Program Files\\Java\\jdk1.8.0\\lib/tools.jar");
         classPathes.add(classesDir.getAbsolutePath());
-        Collection<File> jarList = FileUtil.listFiles(libDir, pathname -> pathname.getName().toLowerCase().endsWith(".jar"), false);
+        Collection<File> jarList = FileUtil.listFiles(libDir, file -> file.isDirectory() || file.getName().toLowerCase().endsWith(".jar"), false);
         for (File jar : jarList) {
             classPathes.add(jar.getAbsolutePath());
         }
@@ -72,6 +71,8 @@ public class JavaDocReader {
         for (File file : list) {
             commandList.add(file.getAbsolutePath());
         }
+
+        System.out.println(StringUtils.join(commandList, System.lineSeparator()));
         com.sun.tools.javadoc.Main.execute(commandList.toArray(new String[commandList.size()]));
     }
 }

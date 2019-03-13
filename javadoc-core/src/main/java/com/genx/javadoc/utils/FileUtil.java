@@ -2,6 +2,8 @@ package com.genx.javadoc.utils;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +39,29 @@ public class FileUtil {
                     innerListFiles(result, file, fileFilter, includeSubDirectories);
                 } else {
                     result.add(file);
+                }
+            }
+        }
+    }
+
+    public static void writeFile(File file, String content) {
+        if (content == null) {
+            return;
+        }
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(file, false);
+            out.write(content.getBytes("UTF-8"));
+            out.flush(); // 把缓存区内容压入文件
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }

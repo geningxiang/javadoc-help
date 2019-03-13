@@ -18,10 +18,14 @@ import java.util.Map;
 public class AnnotationUtil {
 
     public static Map<String, AnnotationVO> readAnnotationMap(ProgramElementDoc doc){
+        return readAnnotationMap(doc.annotations());
+    }
+
+    public static Map<String, AnnotationVO> readAnnotationMap(AnnotationDesc[] annotationDescs){
         Map<String, AnnotationVO> map = new HashMap<>(8);
-        for (AnnotationDesc annotation : doc.annotations()) {
+        for (AnnotationDesc annotation : annotationDescs) {
             AnnotationVO annotationVO = new AnnotationVO();
-            annotationVO.setClassName(annotation.annotationType().qualifiedTypeName());
+//            annotationVO.setClassName(annotation.annotationType().qualifiedTypeName());
             Map<String, String[]> data = new HashMap<>(8);
             for (AnnotationDesc.ElementValuePair elementValuePair : annotation.elementValues()) {
                 data.put(elementValuePair.element().name(), parseObjectToStringArray(elementValuePair.value().value()));
@@ -33,7 +37,7 @@ public class AnnotationUtil {
                 }
             }
             annotationVO.setData(data);
-            map.put(annotationVO.getClassName(), annotationVO);
+            map.put(annotation.annotationType().qualifiedTypeName(), annotationVO);
         }
         return map;
     }
@@ -46,6 +50,9 @@ public class AnnotationUtil {
                 return null;
             }
         } else {
+            if(String.valueOf(value).length() == 0){
+                return null;
+            }
             array = new Object[]{value};
         }
         String[] ss = new String[array.length];

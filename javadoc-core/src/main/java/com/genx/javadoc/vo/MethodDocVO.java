@@ -19,11 +19,11 @@ public class MethodDocVO {
 
     private String methodName;
 
-    private Map<String, AnnotationVO> annotationMap;
+    private Map<String, AnnotationVO> annotations;
 
     private String comment;
 
-    private List<Param> params;
+    private List<ParamerVO> params;
 
     private String returnType;
 
@@ -35,17 +35,17 @@ public class MethodDocVO {
         this.methodName = methodDoc.name();
         this.comment = methodDoc.commentText();
 
-        this.annotationMap = AnnotationUtil.readAnnotationMap(methodDoc);
+        this.annotations = AnnotationUtil.readAnnotationMap(methodDoc);
 
 
-        List<Param> params = new ArrayList<>(methodDoc.parameters().length);
+        List<ParamerVO> params = new ArrayList<>(methodDoc.parameters().length);
         Map<String, String> paramCommentMap = new HashMap();
         for (ParamTag paramTag : methodDoc.paramTags()) {
             paramCommentMap.put(paramTag.parameterName(), paramTag.parameterComment());
         }
 
         for (Parameter parameter : methodDoc.parameters()) {
-            params.add(new Param(parameter.type().qualifiedTypeName(), parameter.name(), paramCommentMap.get(parameter.name())));
+            params.add(new ParamerVO(parameter, paramCommentMap.get(parameter.name())));
         }
         this.params = params;
 
@@ -68,15 +68,11 @@ public class MethodDocVO {
         return methodName;
     }
 
-    public Map<String, AnnotationVO> getAnnotationMap() {
-        return annotationMap;
-    }
-
     public String getComment() {
         return comment;
     }
 
-    public List<Param> getParams() {
+    public List<ParamerVO> getParams() {
         return params;
     }
 
@@ -90,5 +86,9 @@ public class MethodDocVO {
 
     public Map<String, String> getThrowExpections() {
         return throwExpections;
+    }
+
+    public Map<String, AnnotationVO> getAnnotations() {
+        return annotations;
     }
 }

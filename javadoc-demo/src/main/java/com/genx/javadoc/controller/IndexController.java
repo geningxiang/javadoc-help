@@ -23,13 +23,12 @@ public class IndexController {
 
     /**
      * 登录
-     *
      * @param userName 用户名
      * @param passWord 密码
      * @return {
      * "status": 200,
      * "msg": "ok",
-     * "token": "5123312!sAd!sadh"      //令牌
+     * "token": "HINASDKBBH5123SH238"      //令牌
      * }
      */
     @RequestMapping(value = "/login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")

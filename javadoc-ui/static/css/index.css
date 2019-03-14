@@ -1,0 +1,78 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+body{
+    font-family: "Source Sans Pro", sans-serif;
+    padding: 20px;
+}
+
+ul#apiContent {
+    list-style: none;
+}
+
+ul#apiContent li {
+    border: 1px solid #999999;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+}
+
+ul#apiContent li h1{
+     padding: 20px 0;
+ }
+ul#apiContent li h2{
+    padding: 10px 0;
+}
+span.method {
+    font-weight: 700;
+    min-width: 80px;
+    padding: 6px 15px;
+    text-align: center;
+    border-radius: 3px;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, .1);
+    font-family: sans-serif;
+    color: #fff;
+    background: #61affe;
+    margin-right: 10px;
+}
+
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th {
+    background-color: #f5f5f5;
+    font-weight: 700;
+    padding: 5px;
+    border: #e0e0e0 1px solid;
+}
+
+td {
+    padding: 5px;
+    border: #e0e0e0 1px solid;
+}
+
+pre {
+    /*background-color: #000;*/
+    background-color: #2d2d2d;
+    border-radius: 8px;
+    margin: 1em auto;
+    padding: 1em;
+}
+
+pre code {
+    /*color: #ffffff;*/
+    color: #7ec699;
+    display: block;
+    font-size: 14px;
+    font-family: "Source Code Pro", monospace;
+    font-style: normal;
+    font-weight: 400;
+    word-wrap: normal;
+    white-space: pre;
+}
+
+

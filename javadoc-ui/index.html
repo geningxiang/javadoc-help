@@ -3,68 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>JavaDoc</title>
-    <style>
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin: 0 0 20px 0;
-        }
-        th {
-            background-color: #f5f5f5;
-            font-family: "Source Sans Pro", sans-serif;
-            font-weight: 700;
-            padding: 5px;
-            border: #e0e0e0 1px solid;
-        }
-
-        td {
-
-            padding: 5px;
-            border: #e0e0e0 1px solid;
-        }
-
-        pre {
-            background-color: #000;
-            -moz-border-radius: 8px;
-            -webkit-border-radius: 8px;
-            -o-border-radius: 8px;
-            -ms-border-radius: 8px;
-            -khtml-border-radius: 8px;
-            border-radius: 8px;
-            margin: 1em auto;
-            padding: 1em;
-        }
-        pre code {
-            color:#ffffff;
-            display: block;
-            font-size: 14px;
-            font-family: "Source Code Pro", monospace;
-            font-style: normal;
-            font-weight: 400;
-            word-wrap: normal;
-            white-space: pre;
-        }
-        span.method{
-            font-size: 14px;
-            font-weight: 700;
-            min-width: 80px;
-            padding: 6px 15px;
-            text-align: center;
-            border-radius: 3px;
-            text-shadow: 0 1px 0 rgba(0,0,0,.1);
-            font-family: sans-serif;
-            color: #fff;
-            background: #61affe;
-            margin-left: 10px;
-        }
-        ul{
-            list-style: none;
-        }
-        ul li{
-            padding-bottom: 30px;
-        }
-    </style>
+    <link href="static/css/index.css" rel="stylesheet">
 </head>
 <body>
 
@@ -76,9 +15,14 @@
 <script id="apiTemplate" type="text/html">
     {{each $data item i}}
     <li>
-        <h1>{{item.path}}<span class="method">{{item.method}}</span></h1>
+        <h1>
+            {{each item.methods method k}}
+            <span class="method">{{method}}</span>
+            {{/each}}
+            {{item.path}}
+        </h1>
         <p>{{item.description}}</p>
-        <h2>参数</h2>
+        <h2>Request</h2>
         <table>
             <tr>
                 <th>字段</th>
@@ -88,34 +32,29 @@
             {{each item.parameters parameter j}}
             <tr>
                 <td>{{parameter.name}}</td>
-                <td>{{parameter.type}}</td>
-                <td>{{parameter.description}}</td>
+                <td>{{parameter.className}}</td>
+                <td>{{parameter.comment}}</td>
             </tr>
             {{/each}}
         </table>
-        <h2>Result</h2>
-        <pre><code>{{@ item.responses['200'].description}}</code></pre>
+        <h2>Response</h2>
+        <pre><code>{{@ item.returnComment}}</code></pre>
     </li>
     {{/each}}
 </script>
 
 <script src="static/js/jquery.min.js"></script>
 <script src="static/js/template-web.js"></script>
-
+<script src="static/js/spring-web-plugin.js"></script>
 <script>
     $(function(){
         $.get('javadoc.json', function(data){
             console.log('json数据', data);
 
-            var apiArray = [];
-            for(var path in data.paths){
-                for(var method in data.paths[path]){
-                    var item = data.paths[path][method];
-                    item.path = path;
-                    item.method = method;
-                    apiArray.push(item);
-                }
-            }
+            var apiArray = SpringWebPlugin.read(data);
+
+            console.log('spring api data', apiArray);
+
 
             //排序一下
             apiArray = apiArray.sort(function (a, b) {

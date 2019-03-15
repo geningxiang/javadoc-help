@@ -14,9 +14,15 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
+
+import static com.genx.javadoc.utils.ZipUtil.unzip;
 
 /**
  * Created with IntelliJ IDEA.
@@ -93,10 +99,30 @@ public class JavaDocMojo extends AbstractMojo {
                 outputDirectory,
                 target);
 
-        File docDir = new File(target.getAbsolutePath() + "/doc");
+        File docDir = new File(target.getAbsolutePath() + "/docs");
         docDir.mkdirs();
-        File file = new File(target.getAbsolutePath() + "/doc/javadoc.json");
-        FileUtil.writeFile(file, JSONObject.toJSONString(map));
 
+        String json = JSONObject.toJSONString(map);
+        File file = new File(target.getAbsolutePath() + "/docs/javadoc.json");
+        FileUtil.writeFile(file, json);
+
+        File file2 = new File(target.getAbsolutePath() + "/docs/javadoc.js");
+        FileUtil.writeFile(file2, "var javadoc = " + json + ";");
+
+        copyHtml(docDir);
+    }
+
+    private void copyHtml(File dir) {
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource resource = resourceLoader.getResource("classpath:html.zip");
+        if (resource.exists()) {
+            try {
+                unzip(resource.getInputStream(), dir);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("未找到 classpath:html.zip");
+        }
     }
 }

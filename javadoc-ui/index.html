@@ -21,7 +21,7 @@
             {{/each}}
             {{item.path}}
         </h1>
-        <p>{{item.description}}</p>
+        <pre><code>{{@ item.description || '暂无'}}</code></pre>
         <h2>Request</h2>
         <table>
             <tr>
@@ -38,7 +38,7 @@
             {{/each}}
         </table>
         <h2>Response</h2>
-        <pre><code>{{@ item.returnComment}}</code></pre>
+        <pre><code>{{@ item.returnComment || '暂无'}}</code></pre>
     </li>
     {{/each}}
 </script>
@@ -46,30 +46,27 @@
 <script src="static/js/jquery.min.js"></script>
 <script src="static/js/template-web.js"></script>
 <script src="static/js/spring-web-plugin.js"></script>
+<script src="javadoc.js"></script>
 <script>
-    $(function(){
-        $.get('javadoc.json', function(data){
-            console.log('json数据', data);
 
-            var apiArray = SpringWebPlugin.read(data);
+    var apiArray = SpringWebPlugin.read(javadoc);
 
-            console.log('spring api data', apiArray);
+    console.log('spring api data', apiArray);
 
 
-            //排序一下
-            apiArray = apiArray.sort(function (a, b) {
-                if(a.path == b.path){
-                    return 0;
-                } else if(a.path > b.path){
-                    return 1;
-                } else {
-                    return -1;
-                }
-            })
+    //排序一下
+    apiArray = apiArray.sort(function (a, b) {
+        if (a.path == b.path) {
+            return 0;
+        } else if (a.path > b.path) {
+            return 1;
+        } else {
+            return -1;
+        }
+    })
 
-            $("#apiContent").html(template("apiTemplate", apiArray));
-        })
-    });
+    $("#apiContent").html(template("apiTemplate", apiArray));
+
 
 </script>
 </body>

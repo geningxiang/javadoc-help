@@ -31,6 +31,21 @@
                 }
             }
             return [];
+        },
+        getParameters: function(methodDoc){
+            var parameters = [];
+            for (var i = 0; methodDoc.params && i < methodDoc.params.length; i++) {
+                if(this.isParameterShow(methodDoc.params[i])){
+                    parameters.push(methodDoc.params[i]);
+                }
+            }
+            return parameters;
+        },
+        isParameterShow: function(parameter){
+            if(parameter.className == 'javax.servlet.http.HttpServletResponse' || parameter.className == 'javax.servlet.http.HttpServletRequest' || parameter.className == 'org.springframework.ui.ModelMap'){
+                return false;
+            }
+            return true;
         }
 
     };
@@ -64,7 +79,7 @@
                         methodName: methodDoc.methodName,
                         returnType: methodDoc.returnType,
                         returnComment: methodDoc.returnComment,
-                        parameters: methodDoc.params
+                        parameters: springUtils.getParameters(methodDoc)
                     });
                 }
 

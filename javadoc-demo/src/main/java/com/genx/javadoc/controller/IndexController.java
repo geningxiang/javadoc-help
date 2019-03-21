@@ -1,5 +1,9 @@
 package com.genx.javadoc.controller;
 
+import com.genx.javadoc.entity.User;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -7,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,11 +38,43 @@ public class IndexController {
      */
     @RequestMapping(value = "/login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public Map<String, String> login(
+            @Validated
             @NotEmpty String userName,
+            @Validated
             @NotBlank
             @Pattern(regexp = "/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,10}$/", message = "密码必须是6~10位数字和字母的组合")
                     String passWord) {
-        return null;
+        System.out.println("userName=" + userName);
+        System.out.println("passWord=" + passWord);
+
+        Map<String, String> map = new HashMap(8);
+        map.put("status", "200");
+        map.put("msg", "登录成功");
+        return map;
+    }
+
+    /**
+     * 登录
+     * @param user
+     * @return {
+     * "status": 200,
+     * "msg": "ok",
+     * "token": "HINASDKBBH5123SH238"      //令牌
+     * }
+     */
+    @RequestMapping(value = "/loginByBean", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public Map<String, String> loginByBean(@Validated User user, BindingResult result) {
+        System.out.println("userName=" + user.getUserName());
+        System.out.println("passWord=" + user.getPassWord());
+        if(result.hasErrors()){
+            for (ObjectError allError : result.getAllErrors()) {
+                System.out.println(allError.getDefaultMessage());
+            }
+        }
+        Map<String, String> map = new HashMap(8);
+        map.put("status", "200");
+        map.put("msg", "登录成功");
+        return map;
     }
 
 

@@ -1,5 +1,9 @@
 package com.genx.javadoc.entity;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -16,11 +20,14 @@ public class User {
     /**
      * 用户名
      */
+    @NotEmpty
     private String userName;
 
     /**
      * 密码
      */
+    @NotBlank
+    @Pattern(regexp = "/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,10}$/", message = "密码必须是6~10位数字和字母的组合")
     private String passWord;
 
     public Long getId() {

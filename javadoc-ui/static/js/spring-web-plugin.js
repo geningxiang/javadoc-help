@@ -89,10 +89,39 @@
         }
         return apiData;
     };
+    var parseTree = function(apiArray, depth){
+        depth = depth || 3; //默认遍历到3层
+        var treeMap = {};
+        for (var i = 0; i < apiArray.length; i++) {
+            var item = apiArray[i];
+            var ss = item.path.split('/');
+
+            var data = treeMap;
+            var currentDepth = 0;
+            for (var j = 0; j < ss.length; j++) {
+                if(ss[j]){
+                    currentDepth++;
+
+                    if(j == ss.length - 1 || currentDepth >= depth){
+                        data[ss.slice(j).join("/")] = null;
+                        break;
+                    } else {
+                        if(!data[ss[j]]) {
+                            data[ss[j]] = {};
+                        }
+                        data = data[ss[j]];
+                    }
+
+                }
+            }
+        }
+        return treeMap;
+    };
 
 
     window.SpringWebPlugin = {
-        "read": read
+        "read": read,
+        "parseTree": parseTree,
     };
 
 }(window);

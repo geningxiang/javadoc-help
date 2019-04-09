@@ -76,21 +76,10 @@
     <build>
         <finalName>javadoc-demo</finalName>
          <plugins>
-
             <plugin>
                 <groupId>com.genx.javadoc</groupId>
                 <artifactId>javadoc-mvn-plugin</artifactId>
-                <version>1.0.0</version>
-                <configuration>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>javaDoc</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <version>1.0.1</version>
             </plugin>
         </plugins>
     </build>

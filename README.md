@@ -1,13 +1,9 @@
 # javadoc-help
 
-[接口界面展示](https://geningxiang.github.io/javadoc-help/javadoc-ui/)
+[接口文档界面展示](https://geningxiang.github.io/javadoc-help/javadoc-ui/)
 
 
-- Swagger 依赖于注解,侵入性太高
-- ApiDoc 依赖于注释,通过node解析源代码,但信息不够全面,注释不符合java规范  
-
-所以想自己写一个插件,根据标准的注释即可生成api文档、接口文档  
-api文档 暂时只考虑 SpringMVC、SpringBoot
+无需任何依赖，只需要规范注释，就可以通过maven插件生成接口文档
 
 
 ```
@@ -16,8 +12,8 @@ api文档 暂时只考虑 SpringMVC、SpringBoot
      * @param userName 用户名
      * @param passWord 密码
      * @return 
-     * 这里没办法 api文档需要自己填一下
-     * 如果是接口文档, 有明确的返回类, 就可以根据返回类显示, 不需要再写这个return注释
+     * 这里没办法 只能自己填一下类json格式
+     * 如果有明确的返回类, 就可以根据具体的类来读取返回格式, 不需要再写这个return注释
      * {
      *   "status": 200,
      *   "msg": "ok",
@@ -34,12 +30,52 @@ api文档 暂时只考虑 SpringMVC、SpringBoot
     }
 ```
 
-已实现:  
-  通过maven插件的形式, 自动扫描项目代码, 将类文档以json格式存储到 target/doc/javadoc.json  
-  
-可以在 javadoc-demo 模块 执行以下语句, 当然请先install一下 javadoc-core和javadoc-mvn-plugin
+
+暂时只上传了私有仓库,如果要体验只能自己加一下 pluginRepository
+```
+    <!-- 插件仓库地址 -->
+    <pluginRepositories>
+        <!-- 默认先请求阿里云 -->
+        <pluginRepository>
+            <id>aliyun</id>
+            <url>https://maven.aliyun.com/nexus/content/groups/public/</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+        <!-- 我的私有仓库地址 -->
+        <pluginRepository>
+            <id>caimao</id>
+            <url>http://60.190.13.162:6118/maven/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+```
+```
+<plugin>
+    <groupId>com.genx.javadoc</groupId>
+    <artifactId>javadoc-mvn-plugin</artifactId>
+    <version>1.0.1</version>
+</plugin>
+```
+
 ```
 mvn package javadoc-mvn:javaDoc
 ```
 
-下一步需要开始完善 前端展现 和 doc文档生成
+暂时只写了SpringMVC的Controller
+
+后续考虑  
+接入到Automate2  
+记录接口的每一次变化  
+实现后端接口变化的实时推送  
+为开发人员提供完整的项目的接口变动记录及各版本之间的差异

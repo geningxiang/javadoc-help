@@ -32,8 +32,8 @@ public class JavaDocReader {
         }
     }
 
-    public synchronized static Map<String, ClassDocVO> read(File sourceDir, File classesDir, File libDir) {
-        javadocExecute(sourceDir, classesDir, libDir);
+    public synchronized static Map<String, ClassDocVO> read(File sourceDir, List<String> compilePaths) {
+        javadocExecute(sourceDir, compilePaths);
         Map<String, ClassDocVO> map = new HashMap(1024);
         ClassDoc[] classes = root.classes();
         for (ClassDoc c : classes) {
@@ -44,14 +44,14 @@ public class JavaDocReader {
 
     }
 
-    private static void javadocExecute(File sourceDir, File classesDir, File libDir) {
-        List<String> classPathes = new ArrayList(1024);
-//        classPathes.add("D:\\Program Files\\Java\\jdk1.8.0\\lib/tools.jar");
-        classPathes.add(classesDir.getAbsolutePath());
-        Collection<File> jarList = FileUtil.listFiles(libDir, file -> file.isDirectory() || file.getName().toLowerCase().endsWith(".jar"), false);
-        for (File jar : jarList) {
-            classPathes.add(jar.getAbsolutePath());
-        }
+    private static void javadocExecute(File sourceDir, List<String> compilePaths) {
+//        List<String> classPathes = new ArrayList(1024);
+////        classPathes.add("D:\\Program Files\\Java\\jdk1.8.0\\lib/tools.jar");
+//        classPathes.add(classesDir.getAbsolutePath());
+//        Collection<File> jarList = FileUtil.listFiles(libDir, file -> file.isDirectory() || file.getName().toLowerCase().endsWith(".jar"), false);
+//        for (File jar : jarList) {
+//            classPathes.add(jar.getAbsolutePath());
+//        }
 
         List<String> commandList = new ArrayList<>(1024);
         commandList.add("-doclet");
@@ -59,7 +59,7 @@ public class JavaDocReader {
         commandList.add("-encoding");
         commandList.add("utf-8");
         commandList.add("-classpath");
-        commandList.add(StringUtils.join(classPathes, ";"));
+        commandList.add(StringUtils.join(compilePaths, ";"));
 
         Collection<File> list = FileUtil.listFiles(sourceDir, file ->
                 file.isDirectory() || file.getName().toLowerCase().endsWith(".java"), false);
@@ -71,8 +71,9 @@ public class JavaDocReader {
         for (File file : list) {
             commandList.add(file.getAbsolutePath());
         }
-
+        System.out.println("#### javadoc command start ####");
         System.out.println(StringUtils.join(commandList, System.lineSeparator()));
+        System.out.println("#### javadoc command end ####");
         com.sun.tools.javadoc.Main.execute(commandList.toArray(new String[commandList.size()]));
     }
 }

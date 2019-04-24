@@ -12,6 +12,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -20,6 +21,7 @@ import org.springframework.core.io.ResourceLoader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import static com.genx.javadoc.utils.ZipUtil.unzip;
@@ -31,7 +33,8 @@ import static com.genx.javadoc.utils.ZipUtil.unzip;
  * @author: genx
  * @date: 2019/3/11 22:51
  */
-@Mojo(name = "javaDoc", defaultPhase = LifecyclePhase.VERIFY)
+@Mojo(name = "javaDoc", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true,
+        requiresDependencyResolution = ResolutionScope.COMPILE)
 public class JavaDocMojo extends AbstractMojo {
 
 
@@ -44,7 +47,7 @@ public class JavaDocMojo extends AbstractMojo {
     @Parameter(defaultValue = "${mojoExecution}", readonly = true)
     private MojoExecution mojo;
 
-    @Parameter(defaultValue = "${plugin}", readonly = true) // Maven 3 only
+    @Parameter(defaultValue = "${plugin}", readonly = true)
     private PluginDescriptor plugin;
 
     @Parameter(defaultValue = "${settings}", readonly = true)
@@ -64,13 +67,19 @@ public class JavaDocMojo extends AbstractMojo {
     private File outputDirectory;
 
 
-    @Parameter(defaultValue = "${project.build.outputDirectory}/${project.build.finalName}/WEB-INF/lib")
-    private File libDir;
+//    @Parameter(defaultValue = "${project.build.outputDirectory}/${project.build.finalName}/WEB-INF/lib")
+//    private File libDir;
+
+
+    @Parameter(defaultValue = "${project.compileClasspathElements}", readonly = true, required = true)
+    private List<String> compilePath;
+
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         System.out.println("JavaDocMojo start");
+
 
         System.out.println(basedir.getAbsolutePath());
 
@@ -80,7 +89,12 @@ public class JavaDocMojo extends AbstractMojo {
 
         System.out.println(outputDirectory);
 
-        System.out.println(libDir);
+//        System.out.println(libDir);
+
+        System.out.println("compilePath:");
+        for (String s : compilePath) {
+            System.out.println(s);
+        }
 
 
         if (sourceDirectory == null || !sourceDirectory.exists()) {
@@ -95,9 +109,7 @@ public class JavaDocMojo extends AbstractMojo {
             throw new MojoFailureException("target error : " + target);
         }
 
-        Map<String, ClassDocVO> map = JavaDocReader.read(sourceDirectory,
-                outputDirectory,
-                target);
+        Map<String, ClassDocVO> map = JavaDocReader.read(sourceDirectory, compilePath);
 
         File docDir = new File(target.getAbsolutePath() + "/docs");
         docDir.mkdirs();

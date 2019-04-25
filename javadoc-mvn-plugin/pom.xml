@@ -6,7 +6,7 @@
 
     <groupId>com.genx.javadoc</groupId>
     <artifactId>javadoc-mvn-plugin</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>maven-plugin</packaging>
 
     <name>javadoc-mvn-plugin</name>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>com.genx.javadoc</groupId>
             <artifactId>javadoc-core</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -74,4 +74,18 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- deploy到私有仓库 -->
+    <distributionManagement>
+        <repository>
+            <id>caimao-releases</id>
+            <name>Caimao Release Repository</name>
+            <url>http://60.190.13.162:6118/maven/</url>
+        </repository>
+        <snapshotRepository>
+            <id>caimao-snapshots</id>
+            <name>Caimao Snapshot Repository</name>
+            <url>http://60.190.13.162:6118/maven/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

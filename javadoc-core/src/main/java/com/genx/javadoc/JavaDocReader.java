@@ -41,9 +41,14 @@ public class JavaDocReader {
             map.put(classDocVO.getClassName(), classDocVO);
         }
         return map;
-
     }
 
+
+    public synchronized static ClassDoc[] readByClassDoc(File sourceDir, List<String> compilePaths) {
+        javadocExecute(sourceDir, compilePaths);
+        Map<String, ClassDocVO> map = new HashMap(1024);
+        return root.classes();
+    }
     private static void javadocExecute(File sourceDir, List<String> compilePaths) {
 //        List<String> classPathes = new ArrayList(1024);
 ////        classPathes.add("D:\\Program Files\\Java\\jdk1.8.0\\lib/tools.jar");
@@ -61,8 +66,14 @@ public class JavaDocReader {
         commandList.add("-classpath");
         commandList.add(StringUtils.join(compilePaths, ";"));
 
-        Collection<File> list = FileUtil.listFiles(sourceDir, file ->
-                file.isDirectory() || file.getName().toLowerCase().endsWith(".java"), false);
+        Collection<File> list;
+        if (sourceDir.isDirectory()) {
+            list = FileUtil.listFiles(sourceDir, file ->
+                    file.isDirectory() || file.getName().toLowerCase().endsWith(".java"), false);
+        } else {
+            list = Arrays.asList(sourceDir);
+        }
+
 
         if (list.size() == 0) {
             throw new IllegalArgumentException("list is null");

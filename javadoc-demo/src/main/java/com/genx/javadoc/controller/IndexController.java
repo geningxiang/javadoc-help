@@ -13,6 +13,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,6 +26,7 @@ import java.util.Map;
 @RequestMapping(value = "/api")
 public class IndexController {
 
+    private Logger logger = Logger.getLogger(IndexController.class.getName());
 
     /**
      * 登录
@@ -46,6 +48,10 @@ public class IndexController {
                     String passWord) {
         System.out.println("userName=" + userName);
         System.out.println("passWord=" + passWord);
+
+        this.logger.info("lalala");
+
+        Logger.getLogger("aaa");
 
         Map<String, String> map = new HashMap(8);
         map.put("status", "200");

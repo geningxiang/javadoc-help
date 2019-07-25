@@ -32,7 +32,7 @@ public class AnnotationUtil {
             }
             //插入默认值
             for (AnnotationTypeElementDoc element : annotation.annotationType().elements()) {
-                if(!data.containsKey(element.name()) && element.defaultValue().value() != null){
+                if(!data.containsKey(element.name()) && element.defaultValue() != null &&  element.defaultValue().value() != null){
                     data.put(element.name(), parseObjectToStringArray(element.defaultValue().value()));
                 }
             }

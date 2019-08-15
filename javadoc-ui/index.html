@@ -58,6 +58,8 @@
 <script src="static/js/spring-web-plugin.js"></script>
 <script src="javadoc.js"></script>
 <script>
+    // 这行是 Opera 的补丁, 少了它 Opera 是直接用跳的而且画面闪烁 by willin
+    $body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body');
 
     var apiArray = SpringWebPlugin.read(javadoc);
 
@@ -76,6 +78,19 @@
     })
 
     $("#apiContent").html(template("apiTemplate", apiArray));
+
+    //尝试定位锚点
+    setTimeout(function(){
+        if(window.location.hash) {
+            console.log('window.location.hash', window.location.hash);
+            var apiLis = $('#apiContent li[data-path^="' + window.location.hash.substring(1) + '"]');
+            console.log(apiLis);
+            if(apiLis.length > 0) {
+                $body.animate({scrollTop: $(apiLis[0]).offset().top}, 300);
+            }
+        }
+    }, 10);
+
 
 
     var apiTree = SpringWebPlugin.parseTree(apiArray, 4);
@@ -101,18 +116,14 @@
 
     var treeEl = $('#tree').treeview({data: parseArray(apiTree)});
 
-    // 这行是 Opera 的补丁, 少了它 Opera 是直接用跳的而且画面闪烁 by willin
-    $body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body');
-
     treeEl.on('nodeSelected', function (e, item) {
         console.log('nodeSelected', item);
 
-        var apiLi = $('#apiContent li[data-path^="' + item.path + '"]').eq(0);
-        console.log('apiLi', apiLi);
-        if(apiLi) {
-            $body.animate({scrollTop: apiLi.offset().top}, 300);
+        var apiLis = $('#apiContent li[data-path^="' + item.path + '"]');
+        console.log('apiLis', apiLis);
+        if(apiLis.length > 0) {
+            $body.animate({scrollTop: $(apiLis[0]).offset().top}, 300);
         }
-
     });
 
 

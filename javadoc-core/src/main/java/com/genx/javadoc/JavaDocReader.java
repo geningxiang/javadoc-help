@@ -43,6 +43,11 @@ public class JavaDocReader {
         return map;
     }
 
+    public synchronized static ClassDoc[] readWithClassDocs(File sourceDir, List<String> compilePaths) {
+        javadocExecute(sourceDir, compilePaths);
+        return root.classes();
+    }
+
 
     public synchronized static ClassDoc[] readByClassDoc(File sourceDir, List<String> compilePaths) {
         javadocExecute(sourceDir, compilePaths);

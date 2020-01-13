@@ -17,7 +17,7 @@ import java.io.FileInputStream;
 public class Test {
 
     public static void main(String[] args) throws Exception {
-        FileInputStream in = new FileInputStream("E:\\idea-workspace\\javadoc-help\\javadoc-demo\\src\\main\\java\\com\\genx\\javadoc\\controller/IndexController.java");
+        FileInputStream in = new FileInputStream("E:\\github-workspace\\javadoc-help\\javadoc-demo\\src\\main\\java\\com\\genx\\javadoc\\controller/IndexController.java");
 
         // parse the file
         ParseResult<CompilationUnit> cu = new JavaParser().parse(in);

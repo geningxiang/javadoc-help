@@ -25,12 +25,13 @@ public class AnnotationUtil {
         Map<String, AnnotationVO> map = new HashMap<>(8);
         for (AnnotationDesc annotation : annotationDescs) {
             AnnotationVO annotationVO = new AnnotationVO();
-//            annotationVO.setClassName(annotation.annotationType().qualifiedTypeName());
+            annotationVO.setClassName(annotation.annotationType().qualifiedTypeName());
+
             Map<String, String[]> data = new HashMap<>(8);
             for (AnnotationDesc.ElementValuePair elementValuePair : annotation.elementValues()) {
                 data.put(elementValuePair.element().name(), parseObjectToStringArray(elementValuePair.value().value()));
             }
-            //插入默认值
+            //设置默认值
             for (AnnotationTypeElementDoc element : annotation.annotationType().elements()) {
                 if(!data.containsKey(element.name()) && element.defaultValue() != null &&  element.defaultValue().value() != null){
                     data.put(element.name(), parseObjectToStringArray(element.defaultValue().value()));

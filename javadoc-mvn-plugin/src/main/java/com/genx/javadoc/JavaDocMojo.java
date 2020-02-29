@@ -3,24 +3,31 @@ package com.genx.javadoc;
 import com.alibaba.fastjson.JSONObject;
 import com.genx.javadoc.utils.FileUtil;
 import com.genx.javadoc.vo.ClassDocVO;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.project.*;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
+import org.apache.maven.shared.dependency.graph.internal.DefaultDependencyGraphBuilder;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +50,12 @@ public class JavaDocMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
+
+    /**
+     * Contains the full list of projects in the reactor.
+     */
+    @Parameter(defaultValue = "${reactorProjects}", readonly = true, required = true)
+    private List<MavenProject> reactorProjects;
 
     @Parameter(defaultValue = "${mojoExecution}", readonly = true)
     private MojoExecution mojo;
@@ -74,6 +87,15 @@ public class JavaDocMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.compileClasspathElements}", readonly = true, required = true)
     private List<String> compilePath;
 
+    @Parameter( property = "scope" )
+    private String scope;
+
+
+    /**
+     * The dependency tree builder to use.
+     */
+    @Component( hint = "default" )
+    private DependencyGraphBuilder dependencyGraphBuilder;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -95,6 +117,65 @@ public class JavaDocMojo extends AbstractMojo {
         for (String s : compilePath) {
             System.out.println(s);
         }
+
+//        System.out.println("project.getArtifacts() = " + project.getArtifacts());
+//
+//        System.out.println("project.getDependencyArtifacts() = "+project.getDependencyArtifacts());
+
+        System.out.println("project.getArtifacts() = " + project.getArtifacts());
+        for (Artifact artifact : project.getArtifacts()) {
+            System.out.println(artifact + " | " + artifact.getFile());
+
+        }
+
+        System.out.println("##############");
+
+        try {
+
+
+            ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
+
+            buildingRequest.setProject( project );
+
+            ArtifactFilter artifactFilter = createResolvingArtifactFilter();
+
+            // non-verbose mode use dependency graph component, which gives consistent results with Maven version
+            // running
+            DependencyNode rootNode =  dependencyGraphBuilder.buildDependencyGraph( buildingRequest, artifactFilter, reactorProjects );
+            //获取依赖树结构
+            System.out.println(JSONObject.toJSONString(rootNode));
+
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+//        try {
+//            RepositorySystemSession session = (RepositorySystemSession) ProjectBuildingRequest.class.getMethod("getRepositorySession").invoke(buildingRequest);
+//            System.out.println("## RepositorySystemSession ##");
+//            System.out.println(session);
+//
+//            DependencyResolutionRequest request = new DefaultDependencyResolutionRequest();
+//            request.setMavenProject(project);
+//
+//            DependencyResolutionRequest.class.getMethod("setRepositorySession", RepositorySystemSession.class).invoke(request, session);
+//
+////            //resolve
+////            DependencyResolutionResult result = this.resolveDependencies(request, reactorProjects);
+////            org.eclipse.aether.graph.DependencyNode graph = (org.eclipse.aether.graph.DependencyNode) DependencyResolutionResult.class.getMethod("getDependencyGraph").invoke(request);
+////            System.out.println("graph = " + graph);
+//
+//
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        } catch (InvocationTargetException e) {
+//            e.printStackTrace();
+//        } catch (NoSuchMethodException e) {
+//            e.printStackTrace();
+//        }
 
 
         if (sourceDirectory == null || !sourceDirectory.exists()) {
@@ -122,6 +203,25 @@ public class JavaDocMojo extends AbstractMojo {
         FileUtil.writeFile(file2, "var javadoc = " + json + ";");
 
         copyHtml(docDir);
+    }
+
+    private ArtifactFilter createResolvingArtifactFilter()
+    {
+        ArtifactFilter filter;
+
+        // filter scope
+        if ( scope != null )
+        {
+            getLog().debug( "+ Resolving dependency tree for scope '" + scope + "'" );
+
+            filter = new ScopeArtifactFilter( scope );
+        }
+        else
+        {
+            filter = null;
+        }
+
+        return filter;
     }
 
     private void copyHtml(File dir) {

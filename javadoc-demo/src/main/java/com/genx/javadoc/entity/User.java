@@ -3,6 +3,7 @@ package com.genx.javadoc.entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,7 +12,7 @@ import javax.validation.constraints.Pattern;
  * @author: genx
  * @date: 2019/3/13 23:32
  */
-public class User {
+public class User implements Serializable {
     /**
      * ID
      */
@@ -52,5 +53,24 @@ public class User {
 
     public void setPassWord(String passWord) {
         this.passWord = passWord;
+    }
+
+    private void test(){
+
+    }
+
+    static class UserBuilder {
+
+        User user = new User();
+
+        public UserBuilder setId(Long id) {
+            user.setId(id);
+            return this;
+        }
+
+        public User build() {
+            return user;
+        }
+
     }
 }

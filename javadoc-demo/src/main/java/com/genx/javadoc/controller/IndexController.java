@@ -1,5 +1,6 @@
 package com.genx.javadoc.controller;
 
+import com.genx.javadoc.common.ResponseBody;
 import com.genx.javadoc.entity.User;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -39,7 +41,7 @@ public class IndexController {
      * }
      */
     @RequestMapping(value = "/login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public Map<String, String> login(
+    public ResponseBody<User> login(
             @Validated
             @NotEmpty String userName,
             @Validated
@@ -53,10 +55,10 @@ public class IndexController {
 
         Logger.getLogger("aaa");
 
-        Map<String, String> map = new HashMap(8);
-        map.put("status", "200");
-        map.put("msg", "登录成功");
-        return map;
+        ResponseBody responseBody = new ResponseBody<User>();
+        responseBody.setCode(200);
+        responseBody.setData(new User());
+        return responseBody;
     }
 
     /**
@@ -97,6 +99,13 @@ public class IndexController {
     @RequestMapping(value = "/logout", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public Map<String, String> logout(String userToken) {
         return null;
+    }
+
+
+    @RequestMapping(value = "/query", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public ResponseBody<List<User>> query(){
+        return new ResponseBody();
+
     }
 
 }

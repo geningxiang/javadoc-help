@@ -1,5 +1,8 @@
 package com.genx.javadoc.vo;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.genx.javadoc.utils.AnnotationUtil;
 import com.sun.javadoc.*;
 
@@ -17,78 +20,110 @@ import java.util.Map;
  */
 public class MethodDocVO {
 
+    /**
+     * 方法名
+     */
     private String methodName;
 
-    private Map<String, AnnotationVO> annotations;
+    /**
+     * 修饰符数值
+     */
+    private int modifierSpecifier;
 
-    private String comment;
-
+    /**
+     * 参数
+     */
     private List<ParamerVO> params;
 
-    private String returnType;
+    /**
+     * 注解
+     */
+    private Map<String, AnnotationVO> annotations;
 
+    /**
+     * 注释
+     */
+    private String commentText;
+
+
+    /**
+     * 返回类型
+     */
+    private ReturnTypeVO returnType;
+
+
+    /**
+     * return 的注释
+     * 这部分注释暂时没有放到 returnType里面去
+     */
     private String returnComment;
 
+    /**
+     * 抛出的异常
+     */
     private Map<String, String> throwExpections;
-
-    public MethodDocVO(MethodDoc methodDoc){
-        this.methodName = methodDoc.name();
-        this.comment = methodDoc.commentText();
-
-        this.annotations = AnnotationUtil.readAnnotationMap(methodDoc);
-
-
-        List<ParamerVO> params = new ArrayList<>(methodDoc.parameters().length);
-        Map<String, String> paramCommentMap = new HashMap();
-        for (ParamTag paramTag : methodDoc.paramTags()) {
-            paramCommentMap.put(paramTag.parameterName(), paramTag.parameterComment());
-        }
-
-        for (Parameter parameter : methodDoc.parameters()) {
-            params.add(new ParamerVO(parameter, paramCommentMap.get(parameter.name())));
-        }
-        this.params = params;
-
-        this.returnType = methodDoc.returnType().toString();
-
-        Tag[] returnTags = methodDoc.tags("return");
-        if(returnTags.length > 0){
-           this.returnComment = returnTags[0].text();
-        }
-
-        throwExpections = new HashMap(8);
-        for (ThrowsTag throwsTag : methodDoc.throwsTags()) {
-            throwExpections.put(throwsTag.exceptionName(), throwsTag.exceptionComment());
-        }
-
-    }
-
 
     public String getMethodName() {
         return methodName;
     }
 
-    public String getComment() {
-        return comment;
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
+
+    public int getModifierSpecifier() {
+        return modifierSpecifier;
+    }
+
+    public void setModifierSpecifier(int modifierSpecifier) {
+        this.modifierSpecifier = modifierSpecifier;
     }
 
     public List<ParamerVO> getParams() {
         return params;
     }
 
-    public String getReturnType() {
+    public void setParams(List<ParamerVO> params) {
+        this.params = params;
+    }
+
+    public Map<String, AnnotationVO> getAnnotations() {
+        return annotations;
+    }
+
+    public void setAnnotations(Map<String, AnnotationVO> annotations) {
+        this.annotations = annotations;
+    }
+
+    public String getCommentText() {
+        return commentText;
+    }
+
+    public void setCommentText(String commentText) {
+        this.commentText = commentText;
+    }
+
+    public ReturnTypeVO getReturnType() {
         return returnType;
+    }
+
+    public void setReturnType(ReturnTypeVO returnType) {
+        this.returnType = returnType;
     }
 
     public String getReturnComment() {
         return returnComment;
     }
 
+    public void setReturnComment(String returnComment) {
+        this.returnComment = returnComment;
+    }
+
     public Map<String, String> getThrowExpections() {
         return throwExpections;
     }
 
-    public Map<String, AnnotationVO> getAnnotations() {
-        return annotations;
+    public void setThrowExpections(Map<String, String> throwExpections) {
+        this.throwExpections = throwExpections;
     }
 }

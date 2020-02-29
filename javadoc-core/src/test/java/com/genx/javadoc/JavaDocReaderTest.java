@@ -3,9 +3,12 @@ package com.genx.javadoc;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.genx.javadoc.utils.StringUtils;
+import com.genx.javadoc.vo.ClassDocVO;
 import com.sun.javadoc.*;
 import org.junit.Test;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,23 +29,101 @@ public class JavaDocReaderTest {
 
     @Test
     public void test() throws IOException {
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource resource = resourceLoader.getResource("classpath:/");
 
+        String path = resource.getFile().getAbsolutePath();
 
-        List<String> classPathList = new ArrayList(512);
-        classPathList.add("E:\\idea-workspace\\CaimaoProject\\FinanceSimulate\\target\\simulate-0.0.1-SNAPSHOT\\BOOT-INF\\classes");
-        for (File file : new File("E:\\idea-workspace\\CaimaoProject\\FinanceSimulate\\target\\simulate-0.0.1-SNAPSHOT\\BOOT-INF\\lib").listFiles()) {
-            classPathList.add(file.getAbsolutePath());
+        List compilePathList = new ArrayList();
+        compilePathList.add(path + "/../../../javadoc-demo/target/javadoc-demo/WEB-INF/classes");
+
+        File libDir = new File(path + "/../../../javadoc-demo/target/javadoc-demo/WEB-INF/lib/");
+        for (File file : libDir.listFiles()) {
+            compilePathList.add(file.getAbsolutePath());
         }
 
-        String path = "E:/idea-workspace/CaimaoProject/FinanceSimulate/src/main/java";
-        ClassDoc[] classDocs = JavaDocReader.readWithClassDocs(new File(path), classPathList);
+        File sourceDirectory = new File(path + "/../../../javadoc-demo/src/main/java/");
+        Map<String, ClassDocVO> map = JavaDocReader.read(sourceDirectory, compilePathList);
+
+
+        System.out.println(JSON.toJSONString(map));
+
+    }
+
+    @Test
+    public void test2() throws IOException {
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource resource = resourceLoader.getResource("classpath:/");
+
+        String path = resource.getFile().getAbsolutePath();
+
+        List compilePathList = new ArrayList();
+        compilePathList.add(path + "/../../../javadoc-demo/target/javadoc-demo/WEB-INF/classes");
+
+        File libDir = new File(path + "/../../../javadoc-demo/target/javadoc-demo/WEB-INF/lib/");
+        for (File file : libDir.listFiles()) {
+            compilePathList.add(file.getAbsolutePath());
+        }
+
+        File sourceDirectory = new File(path + "/../../../javadoc-demo/src/main/java/");
+        ClassDoc[] classDocs =  JavaDocReader.readWithClassDocs(sourceDirectory, compilePathList);
+
 
         for (ClassDoc classDoc : classDocs) {
-            if ("com.caimao.finance.simulate.controller.DetailController".equals(classDoc.qualifiedTypeName())) {
-                parseClassDoc(classDoc);
+            if(classDoc.qualifiedTypeName().startsWith("com.genx.javadoc.controller")){
+                System.out.println("==========================");
+                System.out.println(classDoc.qualifiedName());
+
+                for (MethodDoc method : classDoc.methods()) {
+                    System.out.println("#########");
+                    System.out.println(method);
+
+                    System.out.println(method.returnType().qualifiedTypeName());
+
+                    System.out.println(method.returnType().asParameterizedType());
+
+                    for (Type type : method.returnType().asParameterizedType().typeArguments()) {
+                        System.out.println(type);
+                        System.out.println("是否list:"+isIterable(type.asClassDoc()));
+                        if(type.asParameterizedType() != null)
+                        for (Type type2 : type.asParameterizedType().typeArguments()){
+                            System.out.println("    "+type2);
+                        }
+                    }
+                }
             }
         }
+    }
 
+    private boolean isIterable(ClassDoc classDoc){
+        if(classDoc.interfaces() != null) {
+            for (ClassDoc anInterface : classDoc.interfaces()) {
+                System.out.println("[interface]"+anInterface.qualifiedName());
+                if("java.lang.Iterable".equals(anInterface.qualifiedName())){
+                    return true;
+                } else {
+                    return isIterable(anInterface);
+                }
+            }
+        }
+        return false;
+    }
+
+    public void test99() {
+        //        List<String> classPathList = new ArrayList(512);
+//        classPathList.add("E:\\idea-workspace\\CaimaoProject\\FinanceSimulate\\target\\simulate-0.0.1-SNAPSHOT\\BOOT-INF\\classes");
+//        for (File file : new File("E:\\idea-workspace\\CaimaoProject\\FinanceSimulate\\target\\simulate-0.0.1-SNAPSHOT\\BOOT-INF\\lib").listFiles()) {
+//            classPathList.add(file.getAbsolutePath());
+//        }
+//
+//        String path = "E:/idea-workspace/CaimaoProject/FinanceSimulate/src/main/java";
+//        ClassDoc[] classDocs = JavaDocReader.readWithClassDocs(new File(path), classPathList);
+//
+//        for (ClassDoc classDoc : classDocs) {
+//            if ("com.caimao.finance.simulate.controller.DetailController".equals(classDoc.qualifiedTypeName())) {
+//                parseClassDoc(classDoc);
+//            }
+//        }
     }
 
     private void parseClassDoc(ClassDoc c) {
@@ -168,7 +249,7 @@ public class JavaDocReaderTest {
                     if (methodReturnType.asTypeVariable() != null && typeVariablMap.containsKey(methodReturnType.asTypeVariable().typeName())) {
                         methodReturnType = typeVariablMap.get(methodReturnType.asTypeVariable().typeName());
                     }
-                    String name =method.name().substring(3, 4).toLowerCase() + method.name().substring(4);
+                    String name = method.name().substring(3, 4).toLowerCase() + method.name().substring(4);
                     json.put(name, parseReturnType(methodReturnType, method.commentText() + commentMap.get(name)));
                 }
             }
@@ -180,9 +261,14 @@ public class JavaDocReaderTest {
         if (type.asClassDoc() != null) {
             for (ClassDoc anInterface : type.asClassDoc().interfaces()) {
 //            System.out.println("【interface】"+anInterface);
-                if ("Collection".equals(anInterface.asClassDoc().simpleTypeName())) {
-                    return true;
+
+                while (anInterface != null) {
+                    if ("Iterable".equals(anInterface.asClassDoc().simpleTypeName())) {
+                        return true;
+                    }
+                    anInterface = anInterface.superclass();
                 }
+
             }
         }
 

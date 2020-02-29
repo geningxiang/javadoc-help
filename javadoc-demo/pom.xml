@@ -53,7 +53,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>6.0.10.Final</version>
         </dependency>
@@ -85,7 +85,7 @@
             <plugin>
                 <groupId>com.genx.javadoc</groupId>
                 <artifactId>javadoc-mvn-plugin</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </plugin>
         </plugins>
     </build>

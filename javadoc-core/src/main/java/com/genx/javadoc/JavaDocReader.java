@@ -1,11 +1,12 @@
 package com.genx.javadoc;
 
+import com.genx.javadoc.utils.ClassReader;
 import com.genx.javadoc.utils.FileUtil;
-import com.genx.javadoc.utils.StringUtils;
 import com.genx.javadoc.vo.ClassDocVO;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.LanguageVersion;
 import com.sun.javadoc.RootDoc;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.*;
@@ -34,13 +35,8 @@ public class JavaDocReader {
 
     public synchronized static Map<String, ClassDocVO> read(File sourceDir, List<String> compilePaths) {
         javadocExecute(sourceDir, compilePaths);
-        Map<String, ClassDocVO> map = new HashMap(1024);
         ClassDoc[] classes = root.classes();
-        for (ClassDoc c : classes) {
-            ClassDocVO classDocVO = new ClassDocVO(c);
-            map.put(classDocVO.getClassName(), classDocVO);
-        }
-        return map;
+        return new ClassReader().read(classes).getResult();
     }
 
     public synchronized static ClassDoc[] readWithClassDocs(File sourceDir, List<String> compilePaths) {
@@ -49,20 +45,7 @@ public class JavaDocReader {
     }
 
 
-    public synchronized static ClassDoc[] readByClassDoc(File sourceDir, List<String> compilePaths) {
-        javadocExecute(sourceDir, compilePaths);
-        Map<String, ClassDocVO> map = new HashMap(1024);
-        return root.classes();
-    }
     private static void javadocExecute(File sourceDir, List<String> compilePaths) {
-//        List<String> classPathes = new ArrayList(1024);
-////        classPathes.add("D:\\Program Files\\Java\\jdk1.8.0\\lib/tools.jar");
-//        classPathes.add(classesDir.getAbsolutePath());
-//        Collection<File> jarList = FileUtil.listFiles(libDir, file -> file.isDirectory() || file.getName().toLowerCase().endsWith(".jar"), false);
-//        for (File jar : jarList) {
-//            classPathes.add(jar.getAbsolutePath());
-//        }
-
         List<String> commandList = new ArrayList<>(1024);
         commandList.add("-doclet");
         commandList.add(Doclet.class.getName());
@@ -73,15 +56,15 @@ public class JavaDocReader {
 
         Collection<File> list;
         if (sourceDir.isDirectory()) {
+            //如果是文件夹 读取文件夹下的所有 .java 文件
             list = FileUtil.listFiles(sourceDir, file ->
                     file.isDirectory() || file.getName().toLowerCase().endsWith(".java"), false);
         } else {
             list = Arrays.asList(sourceDir);
         }
 
-
         if (list.size() == 0) {
-            throw new IllegalArgumentException("list is null");
+            throw new IllegalArgumentException("源文件不能为空");
         }
 
         for (File file : list) {

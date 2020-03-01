@@ -3,6 +3,7 @@ package com.genx.javadoc.vo;
 import com.genx.javadoc.utils.AnnotationUtil;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.MethodDoc;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.Map;
  * @author: genx
  * @date: 2019/3/12 9:32
  */
-public class ClassDocVO {
+public class ClassDocVO implements IHasAnnotation{
 
     /**
      * 类名  全名
@@ -91,6 +92,14 @@ public class ClassDocVO {
 
     public Map<String, AnnotationVO> getAnnotations() {
         return annotations;
+    }
+
+    public boolean hasAnnotation(String annotationClassName){
+        return StringUtils.isNotBlank(annotationClassName) && annotations != null && annotations.containsKey(annotationClassName);
+    }
+
+    public AnnotationVO getAnnotation(String annotationClassName) {
+        return annotations != null ? annotations.get(annotationClassName) : null;
     }
 
     public void setAnnotations(Map<String, AnnotationVO> annotations) {

@@ -1,13 +1,7 @@
 package com.genx.javadoc.vo;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.genx.javadoc.utils.AnnotationUtil;
-import com.sun.javadoc.*;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +12,7 @@ import java.util.Map;
  * @author: genx
  * @date: 2019/3/12 9:35
  */
-public class MethodDocVO {
+public class MethodDocVO implements IHasAnnotation{
 
     /**
      * 方法名
@@ -33,7 +27,7 @@ public class MethodDocVO {
     /**
      * 参数
      */
-    private List<ParamerVO> params;
+    private List<TypeDoc> params;
 
     /**
      * 注解
@@ -49,7 +43,7 @@ public class MethodDocVO {
     /**
      * 返回类型
      */
-    private ReturnTypeVO returnType;
+    private TypeDoc returnType;
 
 
     /**
@@ -62,6 +56,7 @@ public class MethodDocVO {
      * 抛出的异常
      */
     private Map<String, String> throwExpections;
+
 
     public String getMethodName() {
         return methodName;
@@ -79,16 +74,24 @@ public class MethodDocVO {
         this.modifierSpecifier = modifierSpecifier;
     }
 
-    public List<ParamerVO> getParams() {
+    public List<TypeDoc> getParams() {
         return params;
     }
 
-    public void setParams(List<ParamerVO> params) {
+    public void setParams(List<TypeDoc> params) {
         this.params = params;
     }
 
     public Map<String, AnnotationVO> getAnnotations() {
         return annotations;
+    }
+    public AnnotationVO getAnnotation(String annotationClassName) {
+        return annotations != null ? annotations.get(annotationClassName) : null;
+    }
+
+
+    public boolean hasAnnotation(String annotationClassName){
+        return StringUtils.isNotBlank(annotationClassName) && annotations != null && annotations.containsKey(annotationClassName);
     }
 
     public void setAnnotations(Map<String, AnnotationVO> annotations) {
@@ -103,11 +106,11 @@ public class MethodDocVO {
         this.commentText = commentText;
     }
 
-    public ReturnTypeVO getReturnType() {
+    public TypeDoc getReturnType() {
         return returnType;
     }
 
-    public void setReturnType(ReturnTypeVO returnType) {
+    public void setReturnType(TypeDoc returnType) {
         this.returnType = returnType;
     }
 

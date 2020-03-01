@@ -17,7 +17,7 @@
      * {
      *   "status": 200,
      *   "msg": "ok",
-     *   "token": "HINASDKBBH5123SH238"      //令牌
+     *   "userToken": "HINASDKBBH5123SH238"      //令牌
      * }
      */
     @RequestMapping(value = "/login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")

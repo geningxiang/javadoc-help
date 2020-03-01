@@ -23,31 +23,72 @@
 
 <script id="apiTemplate" type="text/html">
     {{each $data item i}}
-    <li data-path="{{item.path}}">
-        <h1>
+    <li data-path="{{item.url}}">
+        {{if item.name}}
+        <h1>{{item.name}}</h1>
+        {{/if}}
+        <h2>
+            {{item.url}}
+        </h2>
+        <div class="methodsBox">
             {{each item.methods method k}}
-            <span class="method">{{method}}</span>
+            <span>{{method}}</span>
             {{/each}}
-            {{item.path}}
-        </h1>
+        </div>
         <pre><code>{{@ item.description || '暂无'}}</code></pre>
-        <h2>Request</h2>
-        <table>
+        <h2>请求参数</h2>
+        <table class="typeTable">
             <tr>
-                <th>字段</th>
+                <th>参数名</th>
                 <th>类型</th>
                 <th>描述</th>
             </tr>
-            {{each item.parameters parameter j}}
+            {{if !item.params || item.params.length == 0}}
             <tr>
-                <td>{{parameter.name}}</td>
-                <td>{{parameter.className}}</td>
-                <td>{{parameter.comment}}</td>
+                <td colspan="3" style="text-align: center">无请求参数</td>
+            </tr>
+            {{/if}}
+            {{each item.paramList item j}}
+            <tr data-depth="{{item.depth}}">
+                <td class="name" style="{{'padding-left:'+(item.depth * 12 + 10)+'px;'}}">
+                    {{if item.depth > 0}}
+                    <div class="depth" style="{{'width:' + (item.depth * 12) + 'px;'}}"></div>
+                    {{/if}}
+                    {{item.name}}
+                </td>
+                <td class="classType" title="{{item.classInfo}}">{{item.type}}
+                <i></i>
+                </td>
+                <td>{{item.comment}}</td>
             </tr>
             {{/each}}
         </table>
-        <h2>Response</h2>
+        <h2>响应内容</h2>
+        <table class="typeTable">
+            <tr>
+                <th>名称</th>
+                <th>类型</th>
+                <th>描述</th>
+            </tr>
+            {{each item.returnList item j}}
+            <tr data-depth="{{item.depth}}">
+                <td class="name" style="{{'padding-left:'+(item.depth * 12 + 10)+'px;'}}">
+                    {{if item.depth > 0}}
+                    <div class="depth" style="{{'width:' + (item.depth * 12) + 'px;'}}"></div>
+                    {{/if}}
+                    {{item.name}}
+                </td>
+                <td class="classType" title="{{item.classInfo}}">{{item.type}}
+                <i></i></td>
+                <td>{{item.comment}}</td>
+            </tr>
+            {{/each}}
+
+        </table>
+        {{if item.returnComment}}
+        <h2>响应描述</h2>
         <pre><code>{{@ item.returnComment || '暂无'}}</code></pre>
+        {{/if}}
     </li>
     {{/each}}
 </script>
@@ -55,76 +96,104 @@
 <script src="static/js/jquery.min.js"></script>
 <script src="static/js/bootstrap-treeview.js"></script>
 <script src="static/js/template-web.js"></script>
-<script src="static/js/spring-web-plugin.js"></script>
-<script src="javadoc.js"></script>
+<script src="./restApiData.js"></script>
 <script>
-    // 这行是 Opera 的补丁, 少了它 Opera 是直接用跳的而且画面闪烁 by willin
-    $body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body');
 
-    var apiArray = SpringWebPlugin.read(javadoc);
+    const TreeUtil = function () {
 
-    console.log('spring api data', apiArray);
+        const parseTreeToList = function (treeObj, list, depth) {
+            let data = Object.assign({}, treeObj);
+            data.data = null;
+            data.depth = depth;
 
+            //维度
+            if (data.dimension > 0) {
+                for (let i = 0; i < data.dimension; i++) {
+                    data.classInfo += '[]';
+                }
+            }
 
-    //排序一下
-    apiArray = apiArray.sort(function (a, b) {
-        if (a.path == b.path) {
-            return 0;
-        } else if (a.path > b.path) {
-            return 1;
-        } else {
-            return -1;
-        }
-    })
+            list.push(data);
+            if (treeObj.data) {
+                for (let i = 0; i < treeObj.data.length; i++) {
+                    parseTreeToList(treeObj.data[i], list, depth + 1);
+                }
+            }
+        };
 
-    $("#apiContent").html(template("apiTemplate", apiArray));
-
-    //尝试定位锚点
-    setTimeout(function(){
-        if(window.location.hash) {
-            console.log('window.location.hash', window.location.hash);
-            var apiLis = $('#apiContent li[data-path^="' + window.location.hash.substring(1) + '"]');
-            console.log(apiLis);
-            if(apiLis.length > 0) {
-                $body.animate({scrollTop: $(apiLis[0]).offset().top}, 300);
+        return {
+            parseTreeToList: function (treeObj) {
+                let list = [];
+                if (Array.isArray(treeObj)) {
+                    treeObj.forEach(function (item) {
+                        parseTreeToList(item, list, 0);
+                    });
+                } else {
+                    parseTreeToList(treeObj, list, 0);
+                }
+                return list;
             }
         }
-    }, 10);
+    }();
 
 
+    restApiData.interfaces.forEach(function (interfaceItem) {
+        interfaceItem.paramList = TreeUtil.parseTreeToList(interfaceItem.params);
+        interfaceItem.returnList = TreeUtil.parseTreeToList(interfaceItem.returnBody);
 
-    var apiTree = SpringWebPlugin.parseTree(apiArray, 4);
 
-    console.log(apiTree);
-
-    var parseArray = function (treeMap, basePath) {
-        var data = [];
-        for (var key in treeMap) {
-            var path = (basePath || '') + '/' + key;
-            var item = {
-                text: '/' + key,
-                path: path
-            };
-            if (treeMap[key]) {
-                item.nodes = parseArray(treeMap[key], path);
-            }
-            data.push(item);
-
-        }
-        return data;
-    };
-
-    var treeEl = $('#tree').treeview({data: parseArray(apiTree)});
-
-    treeEl.on('nodeSelected', function (e, item) {
-        console.log('nodeSelected', item);
-
-        var apiLis = $('#apiContent li[data-path^="' + item.path + '"]');
-        console.log('apiLis', apiLis);
-        if(apiLis.length > 0) {
-            $body.animate({scrollTop: $(apiLis[0]).offset().top}, 300);
-        }
     });
+
+    console.log('restApiData', restApiData);
+
+    $("#apiContent").html(template("apiTemplate", restApiData.interfaces));
+
+    // //尝试定位锚点
+    // setTimeout(function(){
+    //     if(window.location.hash) {
+    //         console.log('window.location.hash', window.location.hash);
+    //         var apiLis = $('#apiContent li[data-path^="' + window.location.hash.substring(1) + '"]');
+    //         console.log(apiLis);
+    //         if(apiLis.length > 0) {
+    //             $body.animate({scrollTop: $(apiLis[0]).offset().top}, 300);
+    //         }
+    //     }
+    // }, 10);
+    //
+    //
+    //
+    // var apiTree = SpringWebPlugin.parseTree(apiArray, 4);
+    //
+    // console.log(apiTree);
+    //
+    // var parseArray = function (treeMap, basePath) {
+    //     var data = [];
+    //     for (var key in treeMap) {
+    //         var path = (basePath || '') + '/' + key;
+    //         var item = {
+    //             text: '/' + key,
+    //             path: path
+    //         };
+    //         if (treeMap[key]) {
+    //             item.nodes = parseArray(treeMap[key], path);
+    //         }
+    //         data.push(item);
+    //
+    //     }
+    //     return data;
+    // };
+    //
+    // var treeEl = $('#tree').treeview({data: parseArray(apiTree)});
+    //
+    // treeEl.on('nodeSelected', function (e, item) {
+    //     console.log('nodeSelected', item);
+    //
+    //     var apiLis = $('#apiContent li[data-path^="' + item.path + '"]');
+    //     console.log('apiLis', apiLis);
+    //     if(apiLis.length > 0) {
+    //         $body.animate({scrollTop: $(apiLis[0]).offset().top}, 300);
+    //     }
+    // });
 
 
 </script>

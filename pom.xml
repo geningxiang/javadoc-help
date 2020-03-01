@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.genx.javadoc</groupId>
-    <artifactId>javadoc-help</artifactId>
-    <version>1.0.0</version>
+    <artifactId>javadoc-parent</artifactId>
+    <version>1.1.0</version>
     <packaging>pom</packaging>
-    <name>javadoc-help</name>
+    <name>javadoc-parent</name>
     <description></description>
 
     <modules>
@@ -21,12 +21,47 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
+        <!-- 自定义 版本参数 -->
         <spring.version>5.2.0.RELEASE</spring.version>
+        <fastjson.version>1.2.62</fastjson.version>
+        <commons-lang3.version>3.9</commons-lang3.version>
+        <junit.version>4.12</junit.version>
+
+        <maven.version>3.6.3</maven.version>
     </properties>
 
     <dependencyManagement>
 
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
 
+
+        </dependencies>
 
     </dependencyManagement>
 

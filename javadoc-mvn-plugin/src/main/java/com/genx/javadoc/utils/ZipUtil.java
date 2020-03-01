@@ -22,13 +22,22 @@ public class ZipUtil {
                 ZipEntry ze;
                 while ((ze = zin.getNextEntry()) != null) {
                     String path = dir.getAbsolutePath() + File.separator + ze.getName();
-
                     if (ze.isDirectory()) {
-                        File unzipFile = new File(path);
-                        if (!unzipFile.isDirectory()) {
-                            unzipFile.mkdirs();
+                        File zipDir = new File(path);
+                        if (!zipDir.exists()) {
+                            zipDir.mkdirs();
                         }
                     } else {
+                        int index = path.lastIndexOf("/");
+
+                        if (index > -1) {
+                            File zipDir = new File(path.substring(0, index));
+                            if (!zipDir.exists()) {
+                                //创建文件夹
+                                zipDir.mkdirs();
+                            }
+                        }
+
                         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(path, false));
                         try {
                             int read;

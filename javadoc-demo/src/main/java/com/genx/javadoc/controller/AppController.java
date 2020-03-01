@@ -1,11 +1,13 @@
 package com.genx.javadoc.controller;
 
+import com.genx.javadoc.common.ResponseEntity;
+import com.genx.javadoc.entity.AppConfigure;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,19 +17,18 @@ import java.util.Map;
  * @date: 2019/3/13 23:35
  */
 @Controller
-@RequestMapping(value = "/api")
+@RequestMapping(value = {"/api/v1/app", "/app"})
 public class AppController {
 
     /**
      * 获取APP首页数据
-     *
-     * @return {
-     * "status": 200,
-     * "msg": "ok"
-     * }
+     * @param clientType 客户端类型
+     * @param version 版本号
+     * @param channel 渠道名称
      */
-    @RequestMapping(value = "/homeInfo", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public Map<String, List<String>> homeInfo() {
+    @ResponseBody
+    @RequestMapping(value = {"/home", "/homeIndex"}, method = {RequestMethod.GET, RequestMethod.POST}, produces = "application/json;charset=UTF-8")
+    public ResponseEntity<List<AppConfigure>> homeInfo(Integer clientType, String version, String channel) {
         return null;
     }
 

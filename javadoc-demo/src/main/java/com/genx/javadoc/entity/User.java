@@ -29,7 +29,13 @@ public class User implements Serializable {
      */
     @NotBlank
     @Pattern(regexp = "/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,10}$/", message = "密码必须是6~10位数字和字母的组合")
-    private String passWord;
+    private transient String passWord;
+
+    /**
+     * 用户令牌
+     */
+    private String userToken;
+
 
     public Long getId() {
         return id;
@@ -55,8 +61,12 @@ public class User implements Serializable {
         this.passWord = passWord;
     }
 
-    private void test(){
+    public String getUserToken() {
+        return userToken;
+    }
 
+    public void setUserToken(String userToken) {
+        this.userToken = userToken;
     }
 
     static class UserBuilder {

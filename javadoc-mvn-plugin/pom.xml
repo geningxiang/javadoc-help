@@ -6,19 +6,18 @@
 
     <groupId>com.genx.javadoc</groupId>
     <artifactId>javadoc-mvn-plugin</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0</version>
+
     <packaging>maven-plugin</packaging>
 
     <name>javadoc-mvn-plugin</name>
-    <!-- FIXME change it to the project's website -->
-    <url>http://www.example.com</url>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.version>3.6.3</maven.version>
-    </properties>
+    <parent>
+        <groupId>com.genx.javadoc</groupId>
+        <artifactId>javadoc-parent</artifactId>
+        <version>1.1.0</version>
+    </parent>
+
 
     <dependencies>
         <dependency>
@@ -43,12 +42,12 @@
         <dependency>
             <groupId>com.genx.javadoc</groupId>
             <artifactId>javadoc-core</artifactId>
-            <version>1.0.2</version>
+            <version>1.1.0</version>
         </dependency>
+
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.55</version>
         </dependency>
 
         <dependency>
@@ -61,7 +60,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>5.1.5.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.shared</groupId>

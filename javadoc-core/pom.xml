@@ -6,25 +6,17 @@
 
     <groupId>com.genx.javadoc</groupId>
     <artifactId>javadoc-core</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0</version>
 
     <name>javadoc-core</name>
-    <!-- FIXME change it to the project's website -->
-    <url>http://www.example.com</url>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-
-
-        <!-- 自定义 版本参数 -->
-        <spring.version>5.1.4.RELEASE</spring.version>
-        <fastjson.version>1.2.62</fastjson.version>
-    </properties>
+    <parent>
+        <groupId>com.genx.javadoc</groupId>
+        <artifactId>javadoc-parent</artifactId>
+        <version>1.1.0</version>
+    </parent>
 
     <dependencies>
-
         <dependency>
             <groupId>com.sun</groupId>
             <artifactId>tools</artifactId>
@@ -32,31 +24,23 @@
             <scope>system</scope>
             <systemPath>${java.home}/../lib/tools.jar</systemPath>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
         </dependency>
-
         <!-- spring mvc start -->
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
+            <artifactId>spring-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.9</version>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>

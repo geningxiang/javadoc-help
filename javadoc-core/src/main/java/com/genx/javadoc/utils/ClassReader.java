@@ -1,9 +1,6 @@
 package com.genx.javadoc.utils;
 
-import com.genx.javadoc.vo.ClassDocVO;
-import com.genx.javadoc.vo.MethodDocVO;
-import com.genx.javadoc.vo.ParamerVO;
-import com.genx.javadoc.vo.TypeVariableVO;
+import com.genx.javadoc.vo.*;
 import com.sun.javadoc.*;
 
 import java.util.ArrayList;
@@ -98,7 +95,7 @@ public class ClassReader {
         methodDocVO.setAnnotations(AnnotationUtil.readAnnotationMap(methodDoc));
 
         //读取参数
-        List<ParamerVO> params = new ArrayList<>(methodDoc.parameters().length);
+        List<TypeDoc> params = new ArrayList<>(methodDoc.parameters().length);
         //读取参数注释
         Map<String, String> paramCommentMap = new HashMap(16);
         for (ParamTag paramTag : methodDoc.paramTags()) {
@@ -106,11 +103,12 @@ public class ClassReader {
         }
         for (Parameter parameter : methodDoc.parameters()) {
             //为每个参数 添加上注释
-            params.add(new ParamerVO(parameter, paramCommentMap.get(parameter.name())));
+            params.add(TypeReader.read(parameter.type(), parameter.name(), paramCommentMap.get(parameter.name())));
         }
         methodDocVO.setParams(params);
 
-        methodDocVO.setReturnType(ReturnTypeReader.read(methodDoc.returnType()));
+        //解析返回类型
+        methodDocVO.setReturnType(TypeReader.read(methodDoc.returnType(), "", ""));
 
         //读取 return 注释
         Tag[] returnTags = methodDoc.tags("return");

@@ -1,5 +1,6 @@
 package com.genx.javadoc.vo;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -15,7 +16,7 @@ public class AnnotationVO {
      * 例如 org.springframework.web.bind.annotation.RequestMapping
      */
     private String className;
-    private Map<String, String[]> data;
+    private Map<String, String[]> data = new HashMap(8);
 
     public String getClassName() {
         return className;
@@ -28,6 +29,15 @@ public class AnnotationVO {
     public Map<String, String[]> getData() {
         return data;
     }
+
+    public String[] getValue(String key) {
+        return data != null ? data.get(key) : null;
+    }
+
+    public void setValue(String key, String[] value) {
+        data.put(key, value);
+    }
+
 
     public void setData(Map<String, String[]> data) {
         this.data = data;

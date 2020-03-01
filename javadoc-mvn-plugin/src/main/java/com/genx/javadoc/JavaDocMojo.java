@@ -1,8 +1,11 @@
 package com.genx.javadoc;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.genx.javadoc.helper.RestApiBuilder;
 import com.genx.javadoc.utils.FileUtil;
 import com.genx.javadoc.vo.ClassDocVO;
+import com.genx.javadoc.vo.RestApiDoc;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
@@ -201,6 +204,16 @@ public class JavaDocMojo extends AbstractMojo {
 
         File file2 = new File(target.getAbsolutePath() + "/docs/javadoc.js");
         FileUtil.writeFile(file2, "var javadoc = " + json + ";");
+
+        RestApiDoc restApiDoc = new RestApiBuilder()
+                .setBaseUrl("测试环境", "http://192.168.1.100:8080/")
+                .setBaseUrl("预发布环境", "http://a.b.c/")
+                .analysisClassDocs(map.values()).build();
+
+
+        File file3 = new File(target.getAbsolutePath() + "/docs/restApiData.js");
+        FileUtil.writeFile(file3, "var restApiData = " + JSON.toJSON(restApiDoc) + ";");
+
 
         copyHtml(docDir);
     }

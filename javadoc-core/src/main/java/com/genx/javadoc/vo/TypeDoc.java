@@ -9,7 +9,7 @@ import java.util.List;
  * @date 2020/2/23 16:44
  */
 
-public class ReturnTypeVO {
+public class TypeDoc {
 
     /**
      * 类名(全)
@@ -22,6 +22,13 @@ public class ReturnTypeVO {
      * com.genx.javadoc.entity.ResponseBody<java.util.List<com.genx.javadoc.entity.User>>
      */
     private String classInfo;
+
+    /**
+     * 大致的类型
+     * Array、Object、String、Number、Boolean
+     * TODO Date类型要不要独立出来
+     */
+    private String type;
 
     /**
      * 名称
@@ -47,7 +54,7 @@ public class ReturnTypeVO {
      */
     private boolean iterable = false;
 
-    private List<ReturnTypeVO> data;
+    private List<TypeDoc> data;
 
 
     public String getClassInfo() {
@@ -99,12 +106,20 @@ public class ReturnTypeVO {
     }
 
 
-    public List<ReturnTypeVO> getData() {
+    public List<TypeDoc> getData() {
         return data;
     }
 
-    public void setData(List<ReturnTypeVO> data) {
+    public void setData(List<TypeDoc> data) {
         this.data = data;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
 

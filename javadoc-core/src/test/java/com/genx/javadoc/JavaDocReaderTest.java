@@ -1,12 +1,10 @@
 package com.genx.javadoc;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.genx.javadoc.helper.RestApiBuilder;
 import com.genx.javadoc.vo.ClassDocVO;
 import com.genx.javadoc.vo.RestApiDoc;
-import com.sun.javadoc.*;
+import com.sun.javadoc.ClassDoc;
 import org.junit.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -15,7 +13,6 @@ import org.springframework.core.io.ResourceLoader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,6 +60,40 @@ public class JavaDocReaderTest {
 
     @Test
     public void test2() throws IOException {
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource resource = resourceLoader.getResource("classpath:/");
+
+        String path = resource.getFile().getAbsolutePath();
+
+        List compilePathList = new ArrayList();
+        compilePathList.add(path + "/../../../javadoc-demo/target/javadoc-demo/WEB-INF/classes");
+
+        File libDir = new File(path + "/../../../javadoc-demo/target/javadoc-demo/WEB-INF/lib/");
+        for (File file : libDir.listFiles()) {
+            compilePathList.add(file.getAbsolutePath());
+        }
+
+        File sourceDirectory = new File(path + "/../../../javadoc-demo/src/main/java/");
+        ClassDoc[] classDocs = JavaDocReader.readWithClassDocs(sourceDirectory, compilePathList);
+
+
+        for (ClassDoc classDoc : classDocs) {
+
+            System.out.println(" == "+classDoc + " == ");
+
+            for (ClassDoc doc : classDoc.importedClasses()) {
+                System.out.println(doc);
+            }
+
+
+
+        }
+
+    }
+
+
+    @Test
+    public void test3() throws IOException {
 
         List compilePathList = new ArrayList();
 
@@ -85,5 +116,6 @@ public class JavaDocReaderTest {
         System.out.println(restApiDoc.getInterfaces().size());
 
     }
+
 
 }

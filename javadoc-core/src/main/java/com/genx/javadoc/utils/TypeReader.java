@@ -57,16 +57,16 @@ public class TypeReader {
         return typeDoc;
     }
 
-    private static void fillListItemType(Type type, TypeDoc TypeDoc, Map<Type, Integer> resolvedMap) {
+    private static void fillListItemType(Type type, TypeDoc typeDoc, Map<Type, Integer> resolvedMap) {
         List<TypeDoc> data = new ArrayList();
         //list 取泛型第一个
-        if (type.asParameterizedType().typeArguments() != null && type.asParameterizedType().typeArguments().length > 0) {
+        if (type != null && type.asParameterizedType() != null && type.asParameterizedType().typeArguments() != null && type.asParameterizedType().typeArguments().length > 0) {
             data.add(read(type.asParameterizedType().typeArguments()[0], "_item", "", resolvedMap));
         }
-        TypeDoc.setData(data);
+        typeDoc.setData(data);
     }
 
-    private static void analysisObject(Type type, TypeDoc TypeDoc, Map<Type, Integer> resolvedMap) {
+    private static void analysisObject(Type type, TypeDoc typeDoc, Map<Type, Integer> resolvedMap) {
         List<TypeDoc> data = new ArrayList();
 
         //读取一遍类的泛型和当前泛型匹配
@@ -117,7 +117,7 @@ public class TypeReader {
 
             }
         }
-        TypeDoc.setData(data);
+        typeDoc.setData(data);
     }
 
 

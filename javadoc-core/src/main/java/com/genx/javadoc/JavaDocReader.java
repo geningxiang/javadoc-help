@@ -29,6 +29,7 @@ public class JavaDocReader {
 
         public static boolean start(RootDoc root) {
             JavaDocReader.root = root;
+
             return true;
         }
     }

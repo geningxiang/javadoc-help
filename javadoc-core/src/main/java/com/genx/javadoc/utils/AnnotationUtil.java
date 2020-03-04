@@ -4,6 +4,7 @@ import com.genx.javadoc.vo.AnnotationVO;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationTypeElementDoc;
 import com.sun.javadoc.ProgramElementDoc;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +44,16 @@ public class AnnotationUtil {
         return map;
     }
 
+    public static String[] readAnnotationValue(ProgramElementDoc doc, String annotationClassName, String key){
+        Map<String, AnnotationVO> map = readAnnotationMap(doc);
+        AnnotationVO annotationVO = map.get(annotationClassName);
+        if(annotationVO != null){
+            return annotationVO.getValue(key);
+        }
+        return null;
+    }
+
+
     private static String[] parseObjectToStringArray(Object value){
         Object[] array;
         if(value.getClass().isArray()){
@@ -64,5 +75,16 @@ public class AnnotationUtil {
             }
         }
         return ss;
+    }
+
+    public static boolean hasAnnotation(ProgramElementDoc doc, String annotationClassName){
+        if(doc != null && StringUtils.isNotBlank(annotationClassName)) {
+            for (AnnotationDesc annotation : doc.annotations()) {
+                if (annotationClassName.equals(annotation.annotationType().qualifiedTypeName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

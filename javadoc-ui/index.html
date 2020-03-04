@@ -98,6 +98,8 @@
 <script src="static/js/template-web.js"></script>
 <script src="./restApiData.js"></script>
 <script>
+    // 这行是 Opera 的补丁, 少了它 Opera 是直接用跳的而且画面闪烁 by willin
+    $body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body');
 
     const TreeUtil = function () {
 
@@ -121,6 +123,7 @@
             }
         };
 
+
         return {
             parseTreeToList: function (treeObj) {
                 let list = [];
@@ -140,60 +143,85 @@
     restApiData.interfaces.forEach(function (interfaceItem) {
         interfaceItem.paramList = TreeUtil.parseTreeToList(interfaceItem.params);
         interfaceItem.returnList = TreeUtil.parseTreeToList(interfaceItem.returnBody);
-
-
     });
 
     console.log('restApiData', restApiData);
 
     $("#apiContent").html(template("apiTemplate", restApiData.interfaces));
 
-    // //尝试定位锚点
-    // setTimeout(function(){
-    //     if(window.location.hash) {
-    //         console.log('window.location.hash', window.location.hash);
-    //         var apiLis = $('#apiContent li[data-path^="' + window.location.hash.substring(1) + '"]');
-    //         console.log(apiLis);
-    //         if(apiLis.length > 0) {
-    //             $body.animate({scrollTop: $(apiLis[0]).offset().top}, 300);
-    //         }
-    //     }
-    // }, 10);
-    //
-    //
-    //
-    // var apiTree = SpringWebPlugin.parseTree(apiArray, 4);
-    //
-    // console.log(apiTree);
-    //
-    // var parseArray = function (treeMap, basePath) {
-    //     var data = [];
-    //     for (var key in treeMap) {
-    //         var path = (basePath || '') + '/' + key;
-    //         var item = {
-    //             text: '/' + key,
-    //             path: path
-    //         };
-    //         if (treeMap[key]) {
-    //             item.nodes = parseArray(treeMap[key], path);
-    //         }
-    //         data.push(item);
-    //
-    //     }
-    //     return data;
-    // };
-    //
-    // var treeEl = $('#tree').treeview({data: parseArray(apiTree)});
-    //
-    // treeEl.on('nodeSelected', function (e, item) {
-    //     console.log('nodeSelected', item);
-    //
-    //     var apiLis = $('#apiContent li[data-path^="' + item.path + '"]');
-    //     console.log('apiLis', apiLis);
-    //     if(apiLis.length > 0) {
-    //         $body.animate({scrollTop: $(apiLis[0]).offset().top}, 300);
-    //     }
-    // });
+    //尝试定位锚点
+    setTimeout(function(){
+        if(window.location.hash) {
+            console.log('window.location.hash', window.location.hash);
+            var apiLis = $('#apiContent li[data-path^="' + window.location.hash.substring(1) + '"]');
+            console.log(apiLis);
+            if(apiLis.length > 0) {
+                $body.animate({scrollTop: $(apiLis[0]).offset().top}, 300);
+            }
+        }
+    }, 10);
+
+
+
+    var parseTree = function(apiArray, depth){
+        depth = depth || 3; //默认遍历到3层
+        var treeMap = {};
+        for (var i = 0; i < apiArray.length; i++) {
+            var item = apiArray[i];
+            var ss = item.url.split('/');
+
+            var data = treeMap;
+            var currentDepth = 0;
+            for (var j = 0; j < ss.length; j++) {
+                if(ss[j]){
+                    currentDepth++;
+
+                    if(j == ss.length - 1 || currentDepth >= depth){
+                        data[ss.slice(j).join("/")] = null;
+                        break;
+                    } else {
+                        if(!data[ss[j]]) {
+                            data[ss[j]] = {};
+                        }
+                        data = data[ss[j]];
+                    }
+
+                }
+            }
+        }
+        return treeMap;
+    };
+
+
+    var apiTree = parseTree(restApiData.interfaces, 4);
+
+    console.log('pathTree', apiTree);
+
+    var parseArray = function (treeMap, basePath) {
+        var data = [];
+        for (var key in treeMap) {
+            var path = (basePath || '') + '/' + key;
+            var item = {
+                text: '/' + key,
+                path: path
+            };
+            if (treeMap[key]) {
+                item.nodes = parseArray(treeMap[key], path);
+            }
+            data.push(item);
+
+        }
+        return data;
+    };
+
+    var treeEl = $('#tree').treeview({data: parseArray(apiTree)});
+
+    treeEl.on('nodeSelected', function (e, item) {
+        var apiLis = $('#apiContent li[data-path^="' + item.path + '"]');
+        if(apiLis.length > 0) {
+            $body.animate({scrollTop: $(apiLis[0]).offset().top}, 300);
+        }
+    });
 
 
 </script>

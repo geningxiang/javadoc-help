@@ -2,9 +2,13 @@ package com.genx.javadoc;
 
 import com.alibaba.fastjson.JSON;
 import com.genx.javadoc.helper.RestApiBuilder;
+import com.genx.javadoc.utils.TypeReader;
 import com.genx.javadoc.vo.ClassDocVO;
 import com.genx.javadoc.vo.RestApiDoc;
+import com.genx.javadoc.vo.TypeDoc;
 import com.sun.javadoc.ClassDoc;
+import com.sun.javadoc.MethodDoc;
+import com.sun.javadoc.Type;
 import org.junit.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -13,6 +17,7 @@ import org.springframework.core.io.ResourceLoader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,10 +84,23 @@ public class JavaDocReaderTest {
 
         for (ClassDoc classDoc : classDocs) {
 
+            if(!"com.genx.javadoc.controller.AppController".equals(classDoc.qualifiedTypeName())){
+                continue;
+            }
+
             System.out.println(" == "+classDoc + " == ");
 
-            for (ClassDoc doc : classDoc.importedClasses()) {
-                System.out.println(doc);
+
+            for (MethodDoc method : classDoc.methods()) {
+
+                System.out.println(" ## " + method + " ## ");
+
+
+                System.out.println(method.returnType());
+
+                TypeDoc typeDoc = TypeReader.read(method.returnType(), "", "");
+
+                System.out.println(JSON.toJSONString(typeDoc));
             }
 
 

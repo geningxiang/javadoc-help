@@ -1,5 +1,9 @@
 package com.genx.javadoc.vo;
 
+import com.genx.javadoc.contants.RoughlyType;
+import com.genx.javadoc.utils.CoreUtil;
+
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -54,7 +58,7 @@ public class TypeDoc {
      */
     private boolean iterable = false;
 
-    private List<TypeDoc> data;
+    private Collection<TypeDoc> data;
 
 
     public String getClassInfo() {
@@ -106,11 +110,11 @@ public class TypeDoc {
     }
 
 
-    public List<TypeDoc> getData() {
+    public Collection<TypeDoc> getData() {
         return data;
     }
 
-    public void setData(List<TypeDoc> data) {
+    public void setData(Collection<TypeDoc> data) {
         this.data = data;
     }
 
@@ -120,6 +124,18 @@ public class TypeDoc {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public static TypeDoc ofObject(String classInfo, String name, String comment){
+        TypeDoc typeDoc = new TypeDoc();
+        typeDoc.setClassInfo(classInfo);
+        typeDoc.setClassName(Object.class.getName());
+        typeDoc.setType(RoughlyType.Object.name());
+        typeDoc.setName(name);
+        typeDoc.setComment(comment);
+        typeDoc.setDimension(0);
+        return typeDoc;
+
     }
 }
 

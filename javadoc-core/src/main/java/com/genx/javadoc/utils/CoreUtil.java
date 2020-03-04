@@ -1,9 +1,16 @@
 package com.genx.javadoc.utils;
 
 import com.genx.javadoc.contants.RoughlyType;
+import com.genx.javadoc.vo.AnnotationVO;
+import com.sun.javadoc.AnnotationDesc;
+import com.sun.javadoc.AnnotationTypeElementDoc;
 import com.sun.javadoc.ClassDoc;
+import com.sun.javadoc.ProgramElementDoc;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -23,6 +30,7 @@ public class CoreUtil {
 
     private static final String DATE = "java.util.Date";
 
+    private static final String MAP = "java.util.Map";
 
     /**
      * 是否基础类型
@@ -44,6 +52,19 @@ public class CoreUtil {
             for (ClassDoc i : classDoc.interfaces()) {
                 if (ITERABLE.equals(i.qualifiedName())) {
                     //如果实现了 java.lang.Iterable 接口 则认为是 可迭代的
+                    return true;
+                } else {
+                    return isIterable(i);
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isMap(com.sun.javadoc.Type type){
+        if (type.asClassDoc() != null && type.asClassDoc() != null && type.asClassDoc().interfaces() != null) {
+            for (ClassDoc i : type.asClassDoc().interfaces()) {
+                if (MAP.equals(i.qualifiedName())) {
                     return true;
                 } else {
                     return isIterable(i);

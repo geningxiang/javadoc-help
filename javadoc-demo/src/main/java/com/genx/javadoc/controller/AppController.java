@@ -1,5 +1,6 @@
 package com.genx.javadoc.controller;
 
+import com.genx.javadoc.common.Page;
 import com.genx.javadoc.common.ResponseEntity;
 import com.genx.javadoc.entity.AppConfigure;
 import org.springframework.stereotype.Controller;
@@ -29,6 +30,26 @@ public class AppController {
     @ResponseBody
     @RequestMapping(value = {"/home", "/homeIndex"}, method = {RequestMethod.GET, RequestMethod.POST}, produces = "application/json;charset=UTF-8")
     public ResponseEntity<List<AppConfigure>> homeInfo(Integer clientType, String version, String channel) {
+        return null;
+    }
+
+    /**
+     * 获取APP首页数据
+     * 测试 类的内部 返回的是包装后的泛型 List<T>
+     * @param clientType 客户端类型
+     * @param version 版本号
+     * @param channel 渠道名称
+     */
+    @ResponseBody
+    @RequestMapping(value = "/homeInfo2", method = {RequestMethod.GET, RequestMethod.POST}, produces = "application/json;charset=UTF-8")
+    public ResponseEntity<Page<AppConfigure>> homeInfo2(Integer clientType, String version, String channel) {
+        return null;
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/homeInfo3", method = {RequestMethod.GET, RequestMethod.POST}, produces = "application/json;charset=UTF-8")
+    public ResponseEntity homeInfo3(Integer clientType, String version, String channel) {
         return null;
     }
 

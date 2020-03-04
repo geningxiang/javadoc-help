@@ -1,31 +1,25 @@
 # javadoc-help
 
-[接口文档界面展示](https://geningxiang.github.io/javadoc-help/javadoc-ui/)
+基于com.sun.javadoc解析源码，生成接口文档
 
+当前版本1.1.0-SNAPSHOT，新增泛型解析
+ 
 
-无需任何依赖，只需要规范注释，就可以通过maven插件生成接口文档
+## 在线体验
+以下是在gitee上找了几个开源项目生成的接口文档
+- [JeecgBoot](http://47.100.63.232:8088/docs/jeecg-boot/index.html)
+- [Guns](http://47.100.63.232:8088/docs/guns/index.html)
+- [RuoYi](http://47.100.63.232:8088/docs/ruoyi/index.html)
+- [zheng](http://47.100.63.232:8088/docs/zheng/index.html)
 
 
 ```
-    /**
-     * 登录
-     * @param userName 用户名
-     * @param passWord 密码
-     * @return 
-     * 这里没办法 只能自己填一下类json格式
-     * 如果有明确的返回类, 就可以根据具体的类来读取返回格式, 不需要再写这个return注释
-     * {
-     *   "status": 200,
-     *   "msg": "ok",
-     *   "userToken": "HINASDKBBH5123SH238"      //令牌
-     * }
+/**
+     * 查询用户好友列表
+     * @param userToken 用户令牌
      */
-    @RequestMapping(value = "/login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public String login(
-            @NotBlank String userName,
-            @NotBlank
-            @Pattern(regexp = "/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,10}$/", message = "密码必须是6~10位数字和字母的组合")
-                    String passWord) {
+    @RequestMapping(value = "/friends", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public ResponseEntity<List<User>> friends(String userToken) {
         return null;
     }
 ```
@@ -64,7 +58,7 @@
 <plugin>
     <groupId>com.genx.javadoc</groupId>
     <artifactId>javadoc-mvn-plugin</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0-SNAPSHOT</version>
 </plugin>
 ```
 
@@ -72,10 +66,6 @@
 mvn package javadoc-mvn:javaDoc
 ```
 
-暂时只写了SpringMVC的Controller
-
-后续考虑  
-接入到Automate2  
-记录接口的每一次变化  
-实现后端接口变化的实时推送  
-为开发人员提供完整的项目的接口变动记录及各版本之间的差异
+##接下来
+- 梳理一遍新增代码
+- 增加多模块项目的支持

@@ -6,6 +6,7 @@ import com.genx.javadoc.helper.RestApiBuilder;
 import com.genx.javadoc.utils.FileUtil;
 import com.genx.javadoc.vo.ClassDocVO;
 import com.genx.javadoc.vo.RestApiDoc;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
@@ -94,6 +95,10 @@ public class JavaDocMojo extends AbstractMojo {
     private String scope;
 
 
+    @Parameter(property="sourceDir")
+    private String sourceDir;
+
+
     /**
      * The dependency tree builder to use.
      */
@@ -104,6 +109,8 @@ public class JavaDocMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         System.out.println("JavaDocMojo start");
+
+        System.out.println("sourceDir="  + sourceDir);
 
 
         System.out.println(basedir.getAbsolutePath());
@@ -193,21 +200,30 @@ public class JavaDocMojo extends AbstractMojo {
             throw new MojoFailureException("target error : " + target);
         }
 
-        Map<String, ClassDocVO> map = JavaDocReader.read(sourceDirectory, compilePath);
+        File file = null;
+        if(StringUtils.isNotBlank(sourceDir)){
+            file = new File(sourceDir);
+        }
+
+        if(file == null || !file.exists()){
+            file = sourceDirectory;
+        }
+
+        System.out.println("当前源码文件夹:" + file.getAbsolutePath());
+
+        Map<String, ClassDocVO> map = JavaDocReader.read(file, compilePath);
 
         File docDir = new File(target.getAbsolutePath() + "/docs");
         docDir.mkdirs();
 
-        String json = JSONObject.toJSONString(map);
-        File file = new File(target.getAbsolutePath() + "/docs/javadoc.json");
-        FileUtil.writeFile(file, json);
-
-        File file2 = new File(target.getAbsolutePath() + "/docs/javadoc.js");
-        FileUtil.writeFile(file2, "var javadoc = " + json + ";");
+//        String json = JSONObject.toJSONString(map);
+//        File file1 = new File(target.getAbsolutePath() + "/docs/javadoc.json");
+//        FileUtil.writeFile(file1, json);
+//
+//        File file2 = new File(target.getAbsolutePath() + "/docs/javadoc.js");
+//        FileUtil.writeFile(file2, "var javadoc = " + json + ";");
 
         RestApiDoc restApiDoc = new RestApiBuilder()
-                .setBaseUrl("测试环境", "http://192.168.1.100:8080/")
-                .setBaseUrl("预发布环境", "http://a.b.c/")
                 .analysisClassDocs(map.values()).build();
 
 

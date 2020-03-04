@@ -80,7 +80,7 @@ public class TypeReader {
 
         //读取一遍类的泛型和当前泛型匹配
         Map<String, Type> typeParameterMap = new HashMap(8);
-        if (type.asClassDoc().typeParameters() != null && type.asClassDoc().typeParameters().length > 0) {
+        if (type.asClassDoc().typeParameters() != null && type.asClassDoc().typeParameters().length > 0 && type.asParameterizedType() != null) {
             for (int i = 0; i < type.asClassDoc().typeParameters().length && i < type.asParameterizedType().typeArguments().length; i++) {
                 typeParameterMap.put(type.asClassDoc().typeParameters()[i].typeName(), type.asParameterizedType().typeArguments()[i]);
             }

@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.genx.javadoc</groupId>
+    <groupId>org.genx.javadoc</groupId>
     <artifactId>javadoc-parent</artifactId>
     <version>1.1.0</version>
     <packaging>pom</packaging>
@@ -25,7 +25,9 @@
         <spring.version>5.2.0.RELEASE</spring.version>
         <fastjson.version>1.2.62</fastjson.version>
         <commons-lang3.version>3.9</commons-lang3.version>
+        <commons-codec.version>1.11</commons-codec.version>
         <junit.version>4.12</junit.version>
+
 
         <maven.version>3.6.3</maven.version>
     </properties>
@@ -65,7 +67,11 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons-codec.version}</version>
+            </dependency>
 
         </dependencies>
 

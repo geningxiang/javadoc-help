@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.genx.javadoc</groupId>
+    <groupId>org.genx.javadoc</groupId>
     <artifactId>javadoc-mvn-plugin</artifactId>
     <version>1.1.0-SNAPSHOT</version>
 
@@ -13,7 +13,7 @@
     <name>javadoc-mvn-plugin</name>
 
     <parent>
-        <groupId>com.genx.javadoc</groupId>
+        <groupId>org.genx.javadoc</groupId>
         <artifactId>javadoc-parent</artifactId>
         <version>1.1.0</version>
     </parent>
@@ -40,7 +40,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.genx.javadoc</groupId>
+            <groupId>org.genx.javadoc</groupId>
             <artifactId>javadoc-core</artifactId>
             <version>1.1.0</version>
         </dependency>

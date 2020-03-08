@@ -2,7 +2,7 @@ package org.genx.javadoc.controller;
 
 import org.genx.javadoc.common.ResponseEntity;
 import org.genx.javadoc.entity.User;
-import org.genx.javadoc.entity.UserLoginField;
+import org.genx.javadoc.field.UserLoginField;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;

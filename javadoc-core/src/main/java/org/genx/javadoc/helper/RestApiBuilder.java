@@ -2,8 +2,9 @@ package org.genx.javadoc.helper;
 
 import org.genx.javadoc.plugin.IRestApiPlugin;
 import org.genx.javadoc.vo.ClassDocVO;
-import org.genx.javadoc.vo.RestApiDoc;
-import org.genx.javadoc.vo.RestInterfaceDoc;
+import org.genx.javadoc.vo.JavaDocVO;
+import org.genx.javadoc.vo.rest.RestApiDoc;
+import org.genx.javadoc.vo.rest.RestInterfaceDoc;
 import org.genx.javadoc.plugin.springmvc.SpringMVCPlugin;
 
 import java.util.ArrayList;
@@ -43,19 +44,18 @@ public class RestApiBuilder {
         return this;
     }
 
-    public RestApiBuilder analysisClassDocs(Iterable<ClassDocVO> classDocVOList) {
+    public RestApiBuilder analysisClassDocs(JavaDocVO javaDocVO) {
         List<RestInterfaceDoc> list = new ArrayList(1024);
         List<RestInterfaceDoc> temp;
-        for (ClassDocVO classDocVO : classDocVOList) {
 
             for (IRestApiPlugin restApiPlugin : restApiPlugins) {
-                temp = restApiPlugin.analysis(classDocVO);
+                temp = restApiPlugin.analysis( javaDocVO);
                 if (temp != null) {
                     list.addAll(temp);
                     break;
                 }
             }
-        }
+
         this.restApiDoc.setInterfaces(list);
         return this;
     }

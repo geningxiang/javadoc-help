@@ -13,12 +13,30 @@ import java.util.Map;
  * @date: 2019/3/12 9:33
  */
 public class AnnotationDocVO {
+    private String name;
+    private String text;
     /**
      * 注解的类名
      * 例如 org.springframework.web.bind.annotation.RequestMapping
      */
     private String className;
     private Map<String, String[]> data;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
 
     public String getClassName() {
         return className;

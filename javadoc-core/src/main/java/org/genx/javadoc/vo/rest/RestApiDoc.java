@@ -1,4 +1,4 @@
-package org.genx.javadoc.vo;
+package org.genx.javadoc.vo.rest;
 
 import java.util.HashMap;
 import java.util.List;

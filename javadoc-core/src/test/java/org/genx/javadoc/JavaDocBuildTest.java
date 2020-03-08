@@ -1,10 +1,5 @@
 package org.genx.javadoc;
 
-import com.alibaba.fastjson.JSON;
-import org.genx.javadoc.helper.RestApiBuilder;
-import org.genx.javadoc.utils.FileUtil;
-import org.genx.javadoc.vo.ClassDocVO;
-import org.genx.javadoc.vo.RestApiDoc;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.File;
@@ -59,16 +54,16 @@ public class JavaDocBuildTest {
         }
 
 
-        Map<String, ClassDocVO> map = JavaDocReader.read(dir, compilePath);
+//        Map<String, ClassDocVO> map = JavaDocReader.read(dir, compilePath);
 
 
 
-        RestApiDoc restApiDoc = new RestApiBuilder()
-                .analysisClassDocs(map.values()).build();
-
-
-        File file3 = new File("E:\\github-workspace\\zheng\\doc/restApiData.js");
-        FileUtil.writeFile(file3, "var restApiData = " + JSON.toJSON(restApiDoc) + ";");
+//        RestApiDoc restApiDoc = new RestApiBuilder()
+//                .analysisClassDocs(map.values()).build();
+//
+//
+//        File file3 = new File("E:\\github-workspace\\zheng\\doc/restApiData.js");
+//        FileUtil.writeFile(file3, "var restApiData = " + JSON.toJSON(restApiDoc) + ";");
 
     }
 

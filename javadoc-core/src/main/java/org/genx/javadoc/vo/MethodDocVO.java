@@ -19,10 +19,6 @@ public class MethodDocVO extends AbsDocVO {
      */
     private String methodName;
 
-    /**
-     * 修饰符数值
-     */
-    private int modifierSpecifier;
 
     /**
      * 参数
@@ -48,14 +44,6 @@ public class MethodDocVO extends AbsDocVO {
 
     public void setMethodName(String methodName) {
         this.methodName = methodName;
-    }
-
-    public int getModifierSpecifier() {
-        return modifierSpecifier;
-    }
-
-    public void setModifierSpecifier(int modifierSpecifier) {
-        this.modifierSpecifier = modifierSpecifier;
     }
 
     public List<TypeDoc> getParams() {

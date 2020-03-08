@@ -1,5 +1,6 @@
 package org.genx.javadoc.vo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,13 +12,6 @@ import java.util.List;
  */
 public class ClassDocVO extends AbsDocVO{
 
-
-    /**
-     * 修饰符数值
-     * {@link java.lang.reflect.Modifier}
-     */
-    private int modifierSpecifier;
-
     /**
      * 类的泛型
      * 例如 Map<K,V>
@@ -28,7 +22,7 @@ public class ClassDocVO extends AbsDocVO{
     /**
      * 所有字段
      */
-    private List<FieldDocVO> fields;
+    private List<TypeDoc> fields;
 
     /**
      * 所有方法
@@ -36,14 +30,18 @@ public class ClassDocVO extends AbsDocVO{
     private List<MethodDocVO> methods;
 
 
+    /**
+     * 是否是可循环的
+     * 通过是否实现 java.lang.Iterable 接口来判断
+     */
+    private boolean iterable = false;
 
-    public int getModifierSpecifier() {
-        return modifierSpecifier;
-    }
+    /**
+     * 判断一下大致类型
+     */
+    private String type;
 
-    public void setModifierSpecifier(int modifierSpecifier) {
-        this.modifierSpecifier = modifierSpecifier;
-    }
+
 
     public List<TypeVariableVO> getTypeParameters() {
         return typeParameters;
@@ -54,12 +52,11 @@ public class ClassDocVO extends AbsDocVO{
     }
 
 
-
-    public List<FieldDocVO> getFields() {
+    public List<TypeDoc> getFields() {
         return fields;
     }
 
-    public void setFields(List<FieldDocVO> fields) {
+    public void setFields(List<TypeDoc> fields) {
         this.fields = fields;
     }
 
@@ -69,5 +66,28 @@ public class ClassDocVO extends AbsDocVO{
 
     public void setMethods(List<MethodDocVO> methods) {
         this.methods = methods;
+    }
+
+    public void addMethod(MethodDocVO method) {
+        if(this.methods == null){
+            this.methods = new ArrayList(16);
+        }
+        this.methods.add(method);
+    }
+
+    public boolean isIterable() {
+        return iterable;
+    }
+
+    public void setIterable(boolean iterable) {
+        this.iterable = iterable;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

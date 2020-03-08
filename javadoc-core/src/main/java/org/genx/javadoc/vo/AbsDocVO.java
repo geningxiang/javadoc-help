@@ -24,6 +24,11 @@ public abstract class AbsDocVO {
     protected String classInfo;
 
     /**
+     * 修饰符数值
+     */
+    private int modifierSpecifier;
+
+    /**
      * 注解
      * key 注解的类名
      */
@@ -117,5 +122,13 @@ public abstract class AbsDocVO {
 
     public void setTags(Map<String, String> tags) {
         this.tags = tags;
+    }
+
+    public int getModifierSpecifier() {
+        return modifierSpecifier;
+    }
+
+    public void setModifierSpecifier(int modifierSpecifier) {
+        this.modifierSpecifier = modifierSpecifier;
     }
 }

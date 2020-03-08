@@ -10,7 +10,7 @@ import java.util.Map;
  * @date 2020/3/1 22:24
  */
 public enum RoughlyType {
-
+    Unknow,
     Array,
     Object,
     String,

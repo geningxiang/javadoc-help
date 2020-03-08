@@ -1,12 +1,7 @@
 package org.genx.javadoc;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.genx.javadoc.utils.FileUtil;
 import org.genx.javadoc.utils.ZipUtil;
-import org.genx.javadoc.vo.ClassDocVO;
-import org.genx.javadoc.vo.RestApiDoc;
-import org.genx.javadoc.helper.RestApiBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -29,7 +24,6 @@ import org.springframework.core.io.ResourceLoader;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -205,27 +199,27 @@ public class JavaDocMojo extends AbstractMojo {
 
         System.out.println("当前源码文件夹:" + file.getAbsolutePath());
 
-        Map<String, ClassDocVO> map = JavaDocReader.read(file, compilePath);
-
-        File docDir = new File(target.getAbsolutePath() + "/docs");
-        docDir.mkdirs();
-
-//        String json = JSONObject.toJSONString(map);
-//        File file1 = new File(target.getAbsolutePath() + "/docs/javadoc.json");
-//        FileUtil.writeFile(file1, json);
+//        Map<String, ClassDocVO> map = JavaDocReader.read(file, compilePath);
 //
-//        File file2 = new File(target.getAbsolutePath() + "/docs/javadoc.js");
-//        FileUtil.writeFile(file2, "var javadoc = " + json + ";");
-
-        RestApiDoc restApiDoc = new RestApiBuilder()
-                .analysisClassDocs(map.values()).build();
-
-
-        File file3 = new File(target.getAbsolutePath() + "/docs/restApiData.js");
-        FileUtil.writeFile(file3, "var restApiData = " + JSON.toJSON(restApiDoc) + ";");
-
-
-        copyHtml(docDir);
+//        File docDir = new File(target.getAbsolutePath() + "/docs");
+//        docDir.mkdirs();
+//
+////        String json = JSONObject.toJSONString(map);
+////        File file1 = new File(target.getAbsolutePath() + "/docs/javadoc.json");
+////        FileUtil.writeFile(file1, json);
+////
+////        File file2 = new File(target.getAbsolutePath() + "/docs/javadoc.js");
+////        FileUtil.writeFile(file2, "var javadoc = " + json + ";");
+//
+//        RestApiDoc restApiDoc = new RestApiBuilder()
+//                .analysisClassDocs(map.values()).build();
+//
+//
+//        File file3 = new File(target.getAbsolutePath() + "/docs/restApiData.js");
+//        FileUtil.writeFile(file3, "var restApiData = " + JSON.toJSON(restApiDoc) + ";");
+//
+//
+//        copyHtml(docDir);
     }
 
     private ArtifactFilter createResolvingArtifactFilter()

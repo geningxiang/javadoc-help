@@ -1,12 +1,13 @@
 package org.genx.javadoc;
 
-import org.genx.javadoc.utils.ClassReader;
-import org.genx.javadoc.utils.FileUtil;
-import org.genx.javadoc.vo.ClassDocVO;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.LanguageVersion;
 import com.sun.javadoc.RootDoc;
 import org.apache.commons.lang3.StringUtils;
+import org.genx.javadoc.utils.FileUtil;
+import org.genx.javadoc.utils.JavaDocBuilder;
+import org.genx.javadoc.vo.ClassDocVO;
+import org.genx.javadoc.vo.JavaDocVO;
 
 import java.io.File;
 import java.util.*;
@@ -34,10 +35,9 @@ public class JavaDocReader {
         }
     }
 
-    public synchronized static Map<String, ClassDocVO> read(File sourceDir, List<String> compilePaths) {
-        javadocExecute(sourceDir, compilePaths);
-        ClassDoc[] classes = root.classes();
-        return new ClassReader().read(classes).getResult();
+    public synchronized static JavaDocVO read(File sourceDir, List<String> compilePaths) {
+        ClassDoc[] classes = readWithClassDocs(sourceDir, compilePaths);
+        return new JavaDocBuilder().read(classes).build();
     }
 
     public synchronized static ClassDoc[] readWithClassDocs(File sourceDir, List<String> compilePaths) {

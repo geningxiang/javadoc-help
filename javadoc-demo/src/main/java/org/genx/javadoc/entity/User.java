@@ -1,5 +1,7 @@
 package org.genx.javadoc.entity;
 
+import lombok.Data;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
@@ -12,6 +14,7 @@ import java.io.Serializable;
  * @author: genx
  * @date: 2019/3/13 23:32
  */
+@Data
 public class User implements Serializable {
     /**
      * ID
@@ -36,38 +39,6 @@ public class User implements Serializable {
      */
     private String userToken;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassWord() {
-        return passWord;
-    }
-
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
-    }
-
-    public String getUserToken() {
-        return userToken;
-    }
-
-    public void setUserToken(String userToken) {
-        this.userToken = userToken;
-    }
 
     static class UserBuilder {
 

@@ -1,7 +1,7 @@
 package org.genx.javadoc.plugin;
 
-import org.genx.javadoc.vo.ClassDocVO;
-import org.genx.javadoc.vo.RestInterfaceDoc;
+import org.genx.javadoc.vo.JavaDocVO;
+import org.genx.javadoc.vo.rest.RestInterfaceDoc;
 
 import java.util.List;
 
@@ -13,12 +13,13 @@ import java.util.List;
  */
 public interface IRestApiPlugin {
 
+
     /**
      * 解析 Class 生成 Rest接口列表
-     * @param classDoc
+     * @param javaDocVO
      * @return if null 尝试下一个插件
      */
-    default List<RestInterfaceDoc> analysis(ClassDocVO classDoc) {
+    default List<RestInterfaceDoc> analysis(JavaDocVO javaDocVO) {
         return null;
     }
 

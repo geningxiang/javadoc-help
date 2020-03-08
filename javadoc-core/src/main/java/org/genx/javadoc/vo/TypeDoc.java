@@ -1,6 +1,10 @@
 package org.genx.javadoc.vo;
 
+import org.springframework.beans.BeanUtils;
+
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,12 +13,11 @@ import java.util.Collection;
  * @date 2020/2/23 16:44
  */
 
-public class TypeDoc extends AbsDocVO{
+public class TypeDoc extends AbsDocVO {
 
 
     /**
      * 名称
-     * 第一级是没有名称的
      */
     private String name;
 
@@ -25,14 +28,15 @@ public class TypeDoc extends AbsDocVO{
     private int dimension = 1;
 
     /**
-     * 是否可循环 是否是list set 等
-     * 通过是否实现 java.lang.Iterable 接口来判断
+     * 指定的泛型
      */
-    private boolean iterable = false;
+    private TypeParameterizedDoc[] parameteres;
 
-    private Collection<TypeDoc> data;
-
-
+    /**
+     * 限制
+     * 例如 required notNull email 等 一般是JSR-303 读出来的
+     */
+    private Set<String> limits;
 
     public String getName() {
         return name;
@@ -50,33 +54,49 @@ public class TypeDoc extends AbsDocVO{
         this.dimension = dimension;
     }
 
-    public boolean isIterable() {
-        return iterable;
+    public TypeParameterizedDoc[] getParameteres() {
+        return parameteres;
     }
 
-    public void setIterable(boolean iterable) {
-        this.iterable = iterable;
+    public void setParameteres(TypeParameterizedDoc[] parameteres) {
+        this.parameteres = parameteres;
     }
 
-
-    public Collection<TypeDoc> getData() {
-        return data;
+    public Set<String> getLimits() {
+        return limits;
     }
 
-    public void setData(Collection<TypeDoc> data) {
-        this.data = data;
+    public void setLimits(Set<String> limits) {
+        this.limits = limits;
     }
 
+    public void addLimits(Collection<String> limits) {
+        if(this.limits == null){
+            this.limits = new HashSet();
+        }
+        this.limits.addAll(limits);
+    }
 
-
-    public static TypeDoc ofObject(String classInfo, String name, String comment){
+    /**
+     * 用于将 字段中的类型 克隆到 方法
+     * @return
+     */
+    public TypeDoc copy() {
         TypeDoc typeDoc = new TypeDoc();
-        typeDoc.setClassInfo(classInfo);
-        typeDoc.setClassName(Object.class.getName());
-        typeDoc.setName(name);
-        typeDoc.setComment(comment);
+        typeDoc.setName(getName());
+        typeDoc.setDimension(getDimension());
+        typeDoc.setClassName(getClassName());
+        typeDoc.setClassInfo(getClassInfo());
         return typeDoc;
+    }
 
+    public static TypeDoc ofVoid(){
+        TypeDoc typeDoc = new TypeDoc();
+        typeDoc.setName("");
+        typeDoc.setDimension(1);
+        typeDoc.setClassName("void");
+        typeDoc.setClassInfo("void");
+        return typeDoc;
     }
 }
 

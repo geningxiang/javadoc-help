@@ -4,11 +4,13 @@ import org.genx.javadoc.common.Page;
 import org.genx.javadoc.common.ResponseEntity;
 import org.genx.javadoc.entity.AppConfigure;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,8 +50,8 @@ public class AppController {
 
 
     @ResponseBody
-    @RequestMapping(value = "/homeInfo3", method = {RequestMethod.GET, RequestMethod.POST}, produces = "application/json;charset=UTF-8")
-    public ResponseEntity homeInfo3(Integer clientType, String version, String channel) {
+    @GetMapping(value = "/homeInfo3", produces = "application/json;charset=UTF-8")
+    public ResponseEntity<Map<String, List<Page<AppConfigure>>>> homeInfo3(Integer clientType, String version, String channel) {
         return null;
     }
 

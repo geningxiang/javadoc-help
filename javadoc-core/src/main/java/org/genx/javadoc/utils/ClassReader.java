@@ -1,11 +1,13 @@
 package org.genx.javadoc.utils;
 
 import com.sun.javadoc.*;
-import org.genx.javadoc.vo.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.genx.javadoc.vo.ClassDocVO;
+import org.genx.javadoc.vo.MethodDocVO;
+import org.genx.javadoc.vo.TypeDoc;
+import org.genx.javadoc.vo.TypeVariableVO;
+
+import java.util.*;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,28 +17,29 @@ import java.util.Map;
  */
 public class ClassReader {
 
-    private Map<String, ClassDocVO> map = new HashMap<>(2048);
+    private final JavaDocBuilder.JavaDocEnv env;
 
-    public ClassReader read(ClassDoc[] classDocs) {
+    public ClassReader(JavaDocBuilder.JavaDocEnv env) {
+        this.env = env;
+    }
+
+
+    public void read(Collection<ClassDoc> classDocs) {
         for (ClassDoc classDoc : classDocs) {
             read(classDoc);
         }
-        return this;
-    }
-
-    public Map<String, ClassDocVO> getResult() {
-        return this.map;
     }
 
 
     public void read(ClassDoc classDoc) {
-        if (this.map.containsKey(classDoc.qualifiedName())) {
+        if (env.exist(classDoc.qualifiedTypeName())) {
             return;
         }
 
         ClassDocVO classDocVO = new ClassDocVO();
+        classDocVO.setClassName(classDoc.qualifiedTypeName());
+        env.add(classDocVO);
 
-        classDocVO.setClassName(classDoc.qualifiedName());
         //类 修饰数值
         classDocVO.setModifierSpecifier(classDoc.modifierSpecifier());
 
@@ -45,6 +48,13 @@ public class ClassReader {
 
         //读取class上的注解
         classDocVO.setAnnotations(AnnotationUtil.readAnnotationMap(classDoc));
+
+        classDocVO.setTags(CoreUtil.readTagMap(classDoc));
+
+        //判断类是否 实现循环接口
+        classDocVO.setIterable(CoreUtil.isIterable(classDoc));
+
+        classDocVO.setType(CoreUtil.assertType(classDoc).name());
 
         //类的泛型
         if (classDoc.typeParameters() != null && classDoc.typeParameters().length > 0) {
@@ -60,10 +70,6 @@ public class ClassReader {
         //类的方法
         classDocVO.setMethods(readMethods(classDoc));
 
-        classDocVO.setTags(CoreUtil.readTagMap(classDoc));
-
-
-        this.map.put(classDoc.qualifiedName(), classDocVO);
 
         //读取内部类
         for (ClassDoc innerClassDoc : classDoc.innerClasses(true)) {
@@ -72,47 +78,40 @@ public class ClassReader {
         }
     }
 
-    private static TypeVariableVO readTypeVariable(TypeVariable typeVariable) {
+    private TypeVariableVO readTypeVariable(TypeVariable typeVariable) {
         TypeVariableVO typeVariableVO = new TypeVariableVO();
         typeVariableVO.setName(typeVariable.typeName());
         typeVariableVO.setDescription(typeVariable.toString());
         return typeVariableVO;
     }
 
-    private static List<FieldDocVO> readFields(ClassDoc classDoc) {
+    private List<TypeDoc> readFields(ClassDoc classDoc) {
         FieldDoc[] fieldDocs = classDoc.fields(false);
-        List<FieldDocVO> fields = new ArrayList(fieldDocs.length);
-        for (FieldDoc methodDoc : fieldDocs) {
-            fields.add(read(methodDoc));
+        List<TypeDoc> fields = new ArrayList(fieldDocs.length);
+        for (FieldDoc fieldDoc : fieldDocs) {
+            fields.add(readType(fieldDoc));
         }
         return fields;
     }
 
-    private static FieldDocVO read(FieldDoc fieldDoc) {
-        FieldDocVO fieldDocVO = new FieldDocVO();
-        fieldDocVO.setFieldName(fieldDoc.name());
-        fieldDocVO.setModifierSpecifier(fieldDoc.modifierSpecifier());
-        fieldDocVO.setClassInfo(fieldDoc.type().toString());
-        fieldDocVO.setClassName(fieldDoc.type().qualifiedTypeName());
-        baseRead(fieldDoc, fieldDocVO);
-        return fieldDocVO;
-    }
 
-    private static List<MethodDocVO> readMethods(ClassDoc classDoc) {
+    private List<MethodDocVO> readMethods(ClassDoc classDoc) {
         MethodDoc[] methodDocs = classDoc.methods(false);
         List<MethodDocVO> methods = new ArrayList(methodDocs.length);
         for (MethodDoc methodDoc : methodDocs) {
-            methods.add(read(methodDoc));
+            methods.add(readMethod(methodDoc));
         }
         return methods;
     }
 
-    private static MethodDocVO read(MethodDoc methodDoc) {
+    private MethodDocVO readMethod(MethodDoc methodDoc) {
         MethodDocVO methodDocVO = new MethodDocVO();
         methodDocVO.setMethodName(methodDoc.name());
-        methodDocVO.setClassInfo(methodDoc.returnType().toString());
-        methodDocVO.setClassName(methodDoc.returnType().qualifiedTypeName());
-        baseRead(methodDoc, methodDocVO);
+        methodDocVO.setClassInfo(null);
+        methodDocVO.setClassName(null);
+        methodDocVO.setComment(methodDoc.commentText());
+        methodDocVO.setAnnotations(AnnotationUtil.readAnnotationMap(methodDoc));
+        methodDocVO.setTags(CoreUtil.readTagMap(methodDoc));
 
         //读取参数
         List<TypeDoc> params = new ArrayList<>(methodDoc.parameters().length);
@@ -123,26 +122,55 @@ public class ClassReader {
         }
         for (Parameter parameter : methodDoc.parameters()) {
             //为每个参数 添加上注释
-            params.add(TypeReader.read(parameter, paramCommentMap.get(parameter.name())));
+            params.add(readType(parameter, paramCommentMap.get(parameter.name())));
         }
         methodDocVO.setParams(params);
 
-        //解析返回类型
-        methodDocVO.setReturnType(TypeReader.read(methodDoc.returnType(), "", "", null));
-
-        Map<String, String> throwExpections = new HashMap(8);
-        for (ThrowsTag throwsTag : methodDoc.throwsTags()) {
-            throwExpections.put(throwsTag.exceptionName(), throwsTag.exceptionComment());
+        //读取 return 注释
+        String returnComment = null;
+        Tag[] returnTags = methodDoc.tags("return");
+        if (returnTags.length > 0) {
+            returnComment = returnTags[0].text();
         }
-        methodDocVO.setThrowExpections(throwExpections);
+
+        //解析返回类型
+        methodDocVO.setReturnType(readType(methodDoc.returnType(), "", returnComment, null, null));
+
+        //方法的显式抛出异常
+        methodDocVO.setThrowExpections(CoreUtil.readThrowExpections(methodDoc));
 
         return methodDocVO;
     }
 
-    private static void baseRead(ProgramElementDoc doc, AbsDocVO docVo){
-        docVo.setComment(doc.commentText());
-        docVo.setAnnotations(AnnotationUtil.readAnnotationMap(doc));
-        docVo.setTags(CoreUtil.readTagMap(doc));
+
+    public TypeDoc readType(Parameter parameter, String comment) {
+        return readType(parameter.type(), parameter.name(), comment, parameter.annotations(), null);
+    }
+
+    public TypeDoc readType(FieldDoc fieldDoc) {
+        return readType(fieldDoc.type(), fieldDoc.name(), fieldDoc.commentText(), fieldDoc.annotations(), CoreUtil.readTagMap(fieldDoc));
+    }
+
+    public TypeDoc readType(Type type, String name, String comment, AnnotationDesc[] annotations, Map<String, String> tags) {
+        onTypeReaded(type);
+
+        TypeDoc typeDoc = new TypeDoc();
+        typeDoc.setClassInfo(type.toString());
+        typeDoc.setClassName(type.qualifiedTypeName());
+        typeDoc.setName(name);
+        typeDoc.setComment(comment);
+        typeDoc.setDimension(type.dimension().length() / 2 + 1);
+        typeDoc.setAnnotations(AnnotationUtil.readAnnotationMap(annotations));
+        typeDoc.setTags(tags);
+        typeDoc.setParameteres(CoreUtil.readParameteres(type));
+
+        return typeDoc;
+    }
+
+    private void onTypeReaded(Type type) {
+        if (type != null && type.asClassDoc() != null) {
+            read(type.asClassDoc());
+        }
     }
 
 }

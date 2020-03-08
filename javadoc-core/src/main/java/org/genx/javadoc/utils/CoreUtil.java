@@ -1,9 +1,9 @@
 package org.genx.javadoc.utils;
 
-import com.sun.javadoc.ClassDoc;
-import com.sun.javadoc.Tag;
+import com.sun.javadoc.*;
 import org.apache.commons.lang3.StringUtils;
 import org.genx.javadoc.contants.RoughlyType;
+import org.genx.javadoc.vo.TypeParameterizedDoc;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -110,23 +110,34 @@ public class CoreUtil {
         if (roughlyType != null) {
             return roughlyType;
         }
-        if (isIterable(type.asClassDoc())) {
+        if(type.asClassDoc() != null){
+            return assertType(type.asClassDoc());
+        }
+        return RoughlyType.Unknow;
+    }
+
+    public static RoughlyType assertType(ClassDoc classDoc) {
+        //基础类型判断
+        RoughlyType roughlyType = RoughlyType.assertBaseType(classDoc.qualifiedTypeName());
+        if (roughlyType != null) {
+            return roughlyType;
+        }
+        if (isIterable(classDoc.asClassDoc())) {
             return RoughlyType.Array;
         }
-        if (isNumber(type.asClassDoc())) {
+        if (isNumber(classDoc.asClassDoc())) {
             return RoughlyType.Number;
         }
-        if (isString(type.asClassDoc())) {
+        if (isString(classDoc.asClassDoc())) {
             return RoughlyType.String;
         }
-        if (isDate(type.asClassDoc())) {
+        if (isDate(classDoc.asClassDoc())) {
             return RoughlyType.Date;
         }
-
         return RoughlyType.Object;
     }
 
-    public static Map<String, String> readTagMap(com.sun.javadoc.Doc type) {
+    public static Map<String, String> readTagMap(Doc type) {
         if (type.tags() != null && type.tags().length > 0) {
             Map<String, String> tagMap = new HashMap(16);
             String tmp;
@@ -142,6 +153,84 @@ public class CoreUtil {
             return tagMap;
         }
         return null;
+    }
+
+    /**
+     * 读取指定的泛型
+     * @param type
+     * @return
+     */
+    public static TypeParameterizedDoc[] readParameteres(Type type) {
+        if (type.asParameterizedType() != null) {
+            TypeParameterizedDoc[] array = new TypeParameterizedDoc[type.asParameterizedType().typeArguments().length];
+            Type item;
+            for (int i = 0; i < type.asParameterizedType().typeArguments().length; i++) {
+                item = type.asParameterizedType().typeArguments()[i];
+                TypeParameterizedDoc typeParameterizedDoc = new TypeParameterizedDoc();
+                typeParameterizedDoc.setText(item.toString());
+                typeParameterizedDoc.setClassName(item.qualifiedTypeName());
+                typeParameterizedDoc.setDimension(item.dimension().length() / 2 + 1);
+                typeParameterizedDoc.setParameteres(readParameteres(item));
+                array[i] = typeParameterizedDoc;
+            }
+            return array;
+        }
+        return null;
+    }
+
+
+    /**
+     * 读取方法的抛出异常
+     * @param methodDoc
+     * @return
+     */
+    public static Map<String, String> readThrowExpections(MethodDoc methodDoc) {
+        Map<String, String> throwExpections = new HashMap(8);
+        if (methodDoc.thrownExceptions() != null) {
+            for (ClassDoc classDoc : methodDoc.thrownExceptions()) {
+                throwExpections.put(classDoc.qualifiedTypeName(), "");
+            }
+        }
+
+        for (ThrowsTag throwsTag : methodDoc.throwsTags()) {
+            if (throwsTag.exceptionType() != null) {
+                throwExpections.put(throwsTag.exceptionType().qualifiedTypeName(), throwsTag.exceptionComment());
+            }
+        }
+        return throwExpections;
+    }
+
+
+    /**
+     * 首字母大写
+     * @param str
+     * @return
+     */
+    public static String upperCase(String str) {
+        if (StringUtils.isNotBlank(str)) {
+            char[] ch = str.toCharArray();
+            if (ch[0] >= 'a' && ch[0] <= 'z') {
+                ch[0] = (char) (ch[0] - 32);
+            }
+            return new String(ch);
+        }
+        return "";
+    }
+
+    /**
+     * 首字母小写
+     * @param str
+     * @return
+     */
+    public static String lowCase(String str) {
+        if (StringUtils.isNotBlank(str)) {
+            char[] ch = str.toCharArray();
+            if (ch[0] >= 'A' && ch[0] <= 'Z') {
+                ch[0] = (char) (ch[0] + 32);
+            }
+            return new String(ch);
+        }
+        return "";
     }
 
 }

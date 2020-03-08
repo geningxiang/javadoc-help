@@ -3,6 +3,8 @@ package org.genx.javadoc.plugin.springmvc;
 import org.apache.commons.lang3.StringUtils;
 import org.genx.javadoc.plugin.IRestApiPlugin;
 import org.genx.javadoc.vo.*;
+import org.genx.javadoc.vo.rest.RestInterfaceDoc;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,8 +27,20 @@ public class SpringMVCPlugin implements IRestApiPlugin {
 
     private static final String REQUEST_MAPPING = "org.springframework.web.bind.annotation.RequestMapping";
 
-
     @Override
+    public List<RestInterfaceDoc> analysis(JavaDocVO javaDoc) {
+        List<RestInterfaceDoc> result = new ArrayList(1024);
+        List<RestInterfaceDoc> list;
+        for (ClassDocVO classDoc : javaDoc.getClassDocs().values()) {
+            list = analysis(classDoc);
+            if (list != null) {
+                result.addAll(list);
+            }
+        }
+        return result;
+    }
+
+
     public List<RestInterfaceDoc> analysis(ClassDocVO classDoc) {
         if (!classDoc.hasAnnotation(REST_CONTROLLER)
                 && !classDoc.hasAnnotation(CONTROLLER)) {
@@ -108,8 +122,8 @@ public class SpringMVCPlugin implements IRestApiPlugin {
         doc.setProduces(readProduces(methodDocVO));
         doc.setName(readName(methodDocVO));
         doc.setDescription(methodDocVO.getComment());
-        doc.setParams(filterMethodParams(methodDocVO.getParams()));
-        doc.setReturnBody(methodDocVO.getReturnType());
+//        doc.setParams(filterMethodParams(methodDocVO.getParams()));
+//        doc.setReturnBody(methodDocVO.getReturnType());
         doc.setReturnComment(methodDocVO.getReturnComment());
         return doc;
     }

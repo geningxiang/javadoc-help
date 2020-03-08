@@ -3,7 +3,6 @@ package org.genx.javadoc.utils;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationTypeElementDoc;
 import com.sun.javadoc.ProgramElementDoc;
-import org.apache.commons.lang3.StringUtils;
 import org.genx.javadoc.vo.AnnotationDocVO;
 
 import java.util.HashMap;
@@ -23,12 +22,14 @@ public class AnnotationUtil {
     }
 
     public static Map<String, AnnotationDocVO> readAnnotationMap(AnnotationDesc[] annotationDescs) {
-        if(annotationDescs == null){
+        if (annotationDescs == null || annotationDescs.length == 0) {
             return null;
         }
         Map<String, AnnotationDocVO> map = new HashMap<>(8);
         for (AnnotationDesc annotation : annotationDescs) {
             AnnotationDocVO annotationVO = new AnnotationDocVO();
+            annotationVO.setName(annotation.annotationType().name());
+            annotationVO.setText(annotation.toString());
             annotationVO.setClassName(annotation.annotationType().qualifiedTypeName());
 
             Map<String, String[]> data = new HashMap<>(8);
@@ -46,16 +47,6 @@ public class AnnotationUtil {
         }
         return map;
     }
-
-    public static String[] readAnnotationValue(ProgramElementDoc doc, String annotationClassName, String key) {
-        Map<String, AnnotationDocVO> map = readAnnotationMap(doc);
-        AnnotationDocVO annotationVO = map.get(annotationClassName);
-        if (annotationVO != null) {
-            return annotationVO.getValues(key);
-        }
-        return null;
-    }
-
 
     private static String[] parseObjectToStringArray(Object value) {
         Object[] array;
@@ -80,14 +71,4 @@ public class AnnotationUtil {
         return ss;
     }
 
-    public static boolean hasAnnotation(ProgramElementDoc doc, String annotationClassName) {
-        if (doc != null && StringUtils.isNotBlank(annotationClassName)) {
-            for (AnnotationDesc annotation : doc.annotations()) {
-                if (annotationClassName.equals(annotation.annotationType().qualifiedTypeName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 }

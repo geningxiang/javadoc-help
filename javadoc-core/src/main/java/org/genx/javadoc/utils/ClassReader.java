@@ -35,6 +35,7 @@ public class ClassReader {
         if (env.exist(classDoc.qualifiedTypeName())) {
             return;
         }
+        System.out.println(classDoc.qualifiedTypeName());
 
         ClassDocVO classDocVO = new ClassDocVO();
         classDocVO.setClassName(classDoc.qualifiedTypeName());
@@ -109,6 +110,7 @@ public class ClassReader {
         methodDocVO.setMethodName(methodDoc.name());
         methodDocVO.setClassInfo(null);
         methodDocVO.setClassName(null);
+        methodDocVO.setModifierSpecifier(methodDoc.modifierSpecifier());
         methodDocVO.setComment(methodDoc.commentText());
         methodDocVO.setAnnotations(AnnotationUtil.readAnnotationMap(methodDoc));
         methodDocVO.setTags(CoreUtil.readTagMap(methodDoc));

@@ -12,11 +12,13 @@ import java.util.Map;
 public enum RoughlyType {
     Unknow,
     Array,
-    Object,
+    Map,
     String,
     Number,
     Boolean,
-    Date;
+    Date,
+    Object;
+
 
 
     private static final Map<String, RoughlyType> BASE_TYPE_MAP = new HashMap(8);

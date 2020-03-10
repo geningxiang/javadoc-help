@@ -45,14 +45,14 @@ public class LomBokPlugin implements IJavaDocPlugin {
                     && !Modifier.isStatic(field.getModifierSpecifier())) {
                 //非transient && 非static
 
-                if (addGet && field.hasAnnotation(LOMBOK_GETTER)) {
+                if (addGet || field.hasAnnotation(LOMBOK_GETTER)) {
                     this.addGetMethod(classDoc, field);
                 }
 
                 if (!Modifier.isFinal(field.getModifierSpecifier())) {
                     //非 final
 
-                    if (addSet && field.hasAnnotation(LOMBOK_SETTER)) {
+                    if (addSet || field.hasAnnotation(LOMBOK_SETTER)) {
                         this.addSetMethod(classDoc, field);
                     }
                 }

@@ -2,6 +2,7 @@ package org.genx.javadoc.plugin.springmvc;
 
 import org.apache.commons.lang3.StringUtils;
 import org.genx.javadoc.plugin.IRestApiPlugin;
+import org.genx.javadoc.utils.DetailedTypeUtil;
 import org.genx.javadoc.vo.*;
 import org.genx.javadoc.vo.rest.RestInterfaceDoc;
 
@@ -31,8 +32,11 @@ public class SpringMVCPlugin implements IRestApiPlugin {
     public List<RestInterfaceDoc> analysis(JavaDocVO javaDoc) {
         List<RestInterfaceDoc> result = new ArrayList(1024);
         List<RestInterfaceDoc> list;
+
+        DetailedTypeUtil detailedTypeUtil = new DetailedTypeUtil(javaDoc);
+
         for (ClassDocVO classDoc : javaDoc.getClassDocs().values()) {
-            list = analysis(classDoc);
+            list = analysis(classDoc, detailedTypeUtil);
             if (list != null) {
                 result.addAll(list);
             }
@@ -41,7 +45,7 @@ public class SpringMVCPlugin implements IRestApiPlugin {
     }
 
 
-    public List<RestInterfaceDoc> analysis(ClassDocVO classDoc) {
+    public List<RestInterfaceDoc> analysis(ClassDocVO classDoc, DetailedTypeUtil detailedTypeUtil) {
         if (!classDoc.hasAnnotation(REST_CONTROLLER)
                 && !classDoc.hasAnnotation(CONTROLLER)) {
             return null;
@@ -49,7 +53,7 @@ public class SpringMVCPlugin implements IRestApiPlugin {
         List<RestInterfaceDoc> list = new ArrayList(16);
         RestInterfaceDoc restInterfaceDoc;
         for (MethodDocVO method : classDoc.getMethods()) {
-            restInterfaceDoc = analysis(classDoc, method);
+            restInterfaceDoc = analysis(classDoc, method, detailedTypeUtil);
             if (restInterfaceDoc != null) {
                 list.add(restInterfaceDoc);
             }
@@ -59,11 +63,11 @@ public class SpringMVCPlugin implements IRestApiPlugin {
 
     }
 
-    private RestInterfaceDoc analysis(ClassDocVO classDoc, MethodDocVO methodDoc) {
+    private RestInterfaceDoc analysis(ClassDocVO classDoc, MethodDocVO methodDoc, DetailedTypeUtil detailedTypeUtil) {
         if (isRequestMapping(classDoc, methodDoc)) {
             String[] paths = readPaths(classDoc, methodDoc);
             if (paths != null && paths.length > 0) {
-                return analysis(paths, classDoc, methodDoc);
+                return analysis(paths, classDoc, methodDoc, detailedTypeUtil);
             }
         }
         return null;
@@ -114,7 +118,7 @@ public class SpringMVCPlugin implements IRestApiPlugin {
         return result;
     }
 
-    private RestInterfaceDoc analysis(String[] urls, ClassDocVO classDocVO, MethodDocVO methodDocVO) {
+    private RestInterfaceDoc analysis(String[] urls, ClassDocVO classDocVO, MethodDocVO methodDocVO, DetailedTypeUtil detailedTypeUtil) {
         RestInterfaceDoc doc = new RestInterfaceDoc();
         doc.setUrl(urls[0]);
         doc.setUrls(urls);
@@ -122,8 +126,19 @@ public class SpringMVCPlugin implements IRestApiPlugin {
         doc.setProduces(readProduces(methodDocVO));
         doc.setName(readName(methodDocVO));
         doc.setDescription(methodDocVO.getComment());
-//        doc.setParams(filterMethodParams(methodDocVO.getParams()));
-//        doc.setReturnBody(methodDocVO.getReturnType());
+
+        if (methodDocVO.getParams() != null && methodDocVO.getParams().size() > 0) {
+            List<TypeDoc> methodParams = filterMethodParams(methodDocVO.getParams());
+
+            List<DetailedTypeDoc> params = new ArrayList(methodDocVO.getParams().size());
+
+            for (TypeDoc param : methodParams) {
+                params.add(detailedTypeUtil.analysis(param));
+            }
+            doc.setParams(params);
+        }
+
+        doc.setReturnBody(detailedTypeUtil.analysis(methodDocVO.getReturnType()));
         doc.setReturnComment(methodDocVO.getReturnComment());
         return doc;
     }

@@ -54,6 +54,10 @@ public class MethodDocVO extends AbsDocVO {
         this.params = params;
     }
 
+    public boolean hasNoParam() {
+        return this.params == null || this.params.size() == 0;
+    }
+
     public TypeDoc getReturnType() {
         return returnType;
     }

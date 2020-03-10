@@ -37,6 +37,7 @@ public class DetailedTypeDoc extends TypeDoc {
         return JSON.parseObject(s, DetailedTypeDoc.class);
     }
 
+
     public String getType() {
         return type;
     }

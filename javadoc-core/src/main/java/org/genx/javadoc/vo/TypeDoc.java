@@ -1,7 +1,6 @@
 package org.genx.javadoc.vo;
 
-import org.springframework.beans.BeanUtils;
-
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -70,8 +69,13 @@ public class TypeDoc extends AbsDocVO {
         this.limits = limits;
     }
 
+
+    public void addLimit(String limit) {
+        addLimits(Arrays.asList(limit));
+    }
+
     public void addLimits(Collection<String> limits) {
-        if(this.limits == null){
+        if (this.limits == null) {
             this.limits = new HashSet();
         }
         this.limits.addAll(limits);
@@ -90,7 +94,7 @@ public class TypeDoc extends AbsDocVO {
         return typeDoc;
     }
 
-    public static TypeDoc ofVoid(){
+    public static TypeDoc ofVoid() {
         TypeDoc typeDoc = new TypeDoc();
         typeDoc.setName("");
         typeDoc.setDimension(1);

@@ -125,6 +125,9 @@ public class CoreUtil {
         if (isIterable(classDoc.asClassDoc())) {
             return RoughlyType.Array;
         }
+        if (isMap(classDoc.asClassDoc())) {
+            return RoughlyType.Map;
+        }
         if (isNumber(classDoc.asClassDoc())) {
             return RoughlyType.Number;
         }

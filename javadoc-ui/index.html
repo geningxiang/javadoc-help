@@ -42,10 +42,11 @@
                 <th>参数名</th>
                 <th>类型</th>
                 <th>描述</th>
+                <th>限制</th>
             </tr>
             {{if !item.params || item.params.length == 0}}
             <tr>
-                <td colspan="3" style="text-align: center">无请求参数</td>
+                <td colspan="4" style="text-align: center">无请求参数</td>
             </tr>
             {{/if}}
             {{each item.paramList item j}}
@@ -60,6 +61,11 @@
                 <i></i>
                 </td>
                 <td>{{item.comment}}</td>
+                <td>
+                    {{each item.limits limit}}
+                    <p>{{limit}}</p>
+                    {{/each}}
+                </td>
             </tr>
             {{/each}}
         </table>
@@ -69,6 +75,7 @@
                 <th>名称</th>
                 <th>类型</th>
                 <th>描述</th>
+                <th>限制</th>
             </tr>
             {{each item.returnList item j}}
             <tr data-depth="{{item.depth}}">
@@ -81,6 +88,11 @@
                 <td class="classType" title="{{item.classInfo}}">{{item.type}}
                 <i></i></td>
                 <td>{{item.comment}}</td>
+                <td>
+                    {{each item.limits limit}}
+                    <p>{{limit}}</p>
+                    {{/each}}
+                </td>
             </tr>
             {{/each}}
 
@@ -104,13 +116,16 @@
     const TreeUtil = function () {
 
         const parseTreeToList = function (treeObj, list, depth) {
+            if(!treeObj) {
+                return;
+            }
             let data = Object.assign({}, treeObj);
             data.data = null;
             data.depth = depth;
 
             //维度
-            if (data.dimension > 0) {
-                for (let i = 0; i < data.dimension; i++) {
+            if (data.dimension > 1) {
+                for (let i = 1; i < data.dimension; i++) {
                     data.classInfo += '[]';
                 }
             }

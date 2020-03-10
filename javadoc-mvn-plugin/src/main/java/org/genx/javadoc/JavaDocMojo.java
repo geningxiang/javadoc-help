@@ -1,7 +1,7 @@
 package org.genx.javadoc;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.genx.javadoc.utils.ZipUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -13,10 +13,17 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugins.annotations.*;
-import org.apache.maven.project.*;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
+import org.genx.javadoc.helper.RestApiBuilder;
+import org.genx.javadoc.utils.FileUtil;
+import org.genx.javadoc.utils.ZipUtil;
+import org.genx.javadoc.vo.JavaDocVO;
+import org.genx.javadoc.vo.rest.RestApiDoc;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -79,18 +86,18 @@ public class JavaDocMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.compileClasspathElements}", readonly = true, required = true)
     private List<String> compilePath;
 
-    @Parameter( property = "scope" )
+    @Parameter(property = "scope")
     private String scope;
 
 
-    @Parameter(property="sourceDir")
+    @Parameter(property = "sourceDir")
     private String sourceDir;
 
 
     /**
      * The dependency tree builder to use.
      */
-    @Component( hint = "default" )
+    @Component(hint = "default")
     private DependencyGraphBuilder dependencyGraphBuilder;
 
     @Override
@@ -98,7 +105,7 @@ public class JavaDocMojo extends AbstractMojo {
 
         System.out.println("JavaDocMojo start");
 
-        System.out.println("sourceDir="  + sourceDir);
+        System.out.println("sourceDir=" + sourceDir);
 
 
         System.out.println(basedir.getAbsolutePath());
@@ -131,19 +138,17 @@ public class JavaDocMojo extends AbstractMojo {
         try {
 
 
-            ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
+            ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
 
-            buildingRequest.setProject( project );
+            buildingRequest.setProject(project);
 
             ArtifactFilter artifactFilter = createResolvingArtifactFilter();
 
             // non-verbose mode use dependency graph component, which gives consistent results with Maven version
             // running
-            DependencyNode rootNode =  dependencyGraphBuilder.buildDependencyGraph( buildingRequest, artifactFilter, reactorProjects );
+            DependencyNode rootNode = dependencyGraphBuilder.buildDependencyGraph(buildingRequest, artifactFilter, reactorProjects);
             //获取依赖树结构
             System.out.println(JSONObject.toJSONString(rootNode));
-
-
 
 
         } catch (Exception e) {
@@ -189,52 +194,48 @@ public class JavaDocMojo extends AbstractMojo {
         }
 
         File file = null;
-        if(StringUtils.isNotBlank(sourceDir)){
+        if (StringUtils.isNotBlank(sourceDir)) {
             file = new File(sourceDir);
         }
 
-        if(file == null || !file.exists()){
+        if (file == null || !file.exists()) {
             file = sourceDirectory;
         }
 
         System.out.println("当前源码文件夹:" + file.getAbsolutePath());
 
-//        Map<String, ClassDocVO> map = JavaDocReader.read(file, compilePath);
+        JavaDocVO javaDocVO = JavaDocReader.read(file, compilePath);
+
+        File docDir = new File(target.getAbsolutePath() + "/docs");
+        docDir.mkdirs();
+
+//        String json = JSONObject.toJSONString(map);
+//        File file1 = new File(target.getAbsolutePath() + "/docs/javadoc.json");
+//        FileUtil.writeFile(file1, json);
 //
-//        File docDir = new File(target.getAbsolutePath() + "/docs");
-//        docDir.mkdirs();
-//
-////        String json = JSONObject.toJSONString(map);
-////        File file1 = new File(target.getAbsolutePath() + "/docs/javadoc.json");
-////        FileUtil.writeFile(file1, json);
-////
-////        File file2 = new File(target.getAbsolutePath() + "/docs/javadoc.js");
-////        FileUtil.writeFile(file2, "var javadoc = " + json + ";");
-//
-//        RestApiDoc restApiDoc = new RestApiBuilder()
-//                .analysisClassDocs(map.values()).build();
-//
-//
-//        File file3 = new File(target.getAbsolutePath() + "/docs/restApiData.js");
-//        FileUtil.writeFile(file3, "var restApiData = " + JSON.toJSON(restApiDoc) + ";");
-//
-//
-//        copyHtml(docDir);
+//        File file2 = new File(target.getAbsolutePath() + "/docs/javadoc.js");
+//        FileUtil.writeFile(file2, "var javadoc = " + json + ";");
+
+        RestApiDoc restApiDoc = new RestApiBuilder()
+                .analysisClassDocs(javaDocVO).build();
+
+
+        File file3 = new File(target.getAbsolutePath() + "/docs/restApiData.js");
+        FileUtil.writeFile(file3, "var restApiData = " + JSON.toJSONString(restApiDoc) + ";");
+
+
+        copyHtml(docDir);
     }
 
-    private ArtifactFilter createResolvingArtifactFilter()
-    {
+    private ArtifactFilter createResolvingArtifactFilter() {
         ArtifactFilter filter;
 
         // filter scope
-        if ( scope != null )
-        {
-            getLog().debug( "+ Resolving dependency tree for scope '" + scope + "'" );
+        if (scope != null) {
+            getLog().debug("+ Resolving dependency tree for scope '" + scope + "'");
 
-            filter = new ScopeArtifactFilter( scope );
-        }
-        else
-        {
+            filter = new ScopeArtifactFilter(scope);
+        } else {
             filter = null;
         }
 

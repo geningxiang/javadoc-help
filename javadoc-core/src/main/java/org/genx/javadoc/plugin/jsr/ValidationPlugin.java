@@ -26,7 +26,7 @@ public class ValidationPlugin implements IJavaDocPlugin {
         Max("元素必须是一个数字，其值必须小于等于指定的最大值", "value"),
         DecimalMin("元素必须是一个数字，其值必须大于等于指定的最小值", "value"),
         DecimalMax("元素必须是一个数字，其值必须小于等于指定的最大值", "value"),
-        Size("元素的大小必须在指定的范围内", "min", "max"),
+        Size("对象长度必须在指定的范围内", "min", "max"),
         Digits("元素必须是一个数字，其值必须在可接受的范围内", "integer", "fraction"),
         Past("元素必须是一个过去的日期"),
         Future("元素必须是一个将来的日期"),
@@ -35,7 +35,7 @@ public class ValidationPlugin implements IJavaDocPlugin {
         NotEmpty("字符串的必须非空"),
 
         // org.hibernate.validator.constraints. 下的注解
-        Length("字符串的大小必须在指定的范围内", "min", "max"),
+        Length("字符串的长度必须在指定的范围内", "min", "max"),
         Range("元素必须在合适的范围内", "min", "max"),
         URL("元素必须是网址", "protocol", "host", "port", "regexp");
 

@@ -1,5 +1,6 @@
 package org.genx.javadoc.vo.rest;
 
+import org.genx.javadoc.vo.DetailedTypeDoc;
 import org.genx.javadoc.vo.TypeDoc;
 
 import java.util.List;
@@ -47,12 +48,12 @@ public class RestInterfaceDoc {
     /**
      * 参数
      */
-    private List<RestTypeDoc> params;
+    private List<DetailedTypeDoc> params;
 
     /**
      * 返回的
      */
-    private RestTypeDoc returnBody;
+    private DetailedTypeDoc returnBody;
 
     /**
      * 返回的备注
@@ -115,19 +116,19 @@ public class RestInterfaceDoc {
         this.urls = urls;
     }
 
-    public List<RestTypeDoc> getParams() {
+    public List<DetailedTypeDoc> getParams() {
         return params;
     }
 
-    public void setParams(List<RestTypeDoc> params) {
+    public void setParams(List<DetailedTypeDoc> params) {
         this.params = params;
     }
 
-    public RestTypeDoc getReturnBody() {
+    public DetailedTypeDoc getReturnBody() {
         return returnBody;
     }
 
-    public void setReturnBody(RestTypeDoc returnBody) {
+    public void setReturnBody(DetailedTypeDoc returnBody) {
         this.returnBody = returnBody;
     }
 }

@@ -52,7 +52,7 @@
 <plugin>
     <groupId>org.genx.javadoc</groupId>
     <artifactId>javadoc-mvn-plugin</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.1</version>
 </plugin>
 ```
 

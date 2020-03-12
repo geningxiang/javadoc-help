@@ -2,29 +2,23 @@
 
 基于com.sun.javadoc解析源码，生成接口文档
 
-当前版本1.1.0-SNAPSHOT，新增泛型解析
- 
-
-## 在线体验
+### 在线体验
 以下是在gitee上找了几个开源项目生成的接口文档
 - [JeecgBoot](http://47.100.63.232:8088/docs/jeecg-boot/index.html)
 - [Guns](http://47.100.63.232:8088/docs/guns/index.html)
 - [RuoYi](http://47.100.63.232:8088/docs/ruoyi/index.html)
 - [zheng](http://47.100.63.232:8088/docs/zheng/index.html)
 
+### 版本说明
 
-```
-/**
-     * 查询用户好友列表
-     * @param userToken 用户令牌
-     */
-    @RequestMapping(value = "/friends", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ResponseEntity<List<User>> friends(String userToken) {
-        return null;
-    }
-```
+| 版本号 | 说明 |
+| :----: | ------ |
+| 1.0.0 | 完成基础解析功能 | 
+| 1.1.0 | 添加泛型解析，新增解析结果的实体类(后续将要持久化) |
+| 1.1.1 | 定义插件，解析各种注释(lombok、jsr-305) | 
 
 
+### MAVEN
 暂时只上传了私有仓库,如果要体验只能自己加一下 pluginRepository
 ```
     <!-- 插件仓库地址 -->
@@ -56,16 +50,42 @@
 ```
 ```
 <plugin>
-    <groupId>com.genx.javadoc</groupId>
+    <groupId>org.genx.javadoc</groupId>
     <artifactId>javadoc-mvn-plugin</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.1-SNAPSHOT</version>
 </plugin>
 ```
 
 ```
-mvn package javadoc-mvn:javaDoc
+mvn javadoc-mvn:javaDoc
 ```
 
-##接下来
-- 梳理一遍新增代码
-- 增加多模块项目的支持
+###常见问题
+```
+使用 Mybatis-Plus的童鞋
+mybatis-plus-extension:3.1.2
+com.baomidou.mybatisplus.extension.plugins.pagination.Page
+17行 import org.jetbrains.annotations.Nullable;
+导致解析是 “找不到org.jetbrains.annotations.Nullable的类文件”
+
+请添加
+<dependency>
+    <groupId>org.jetbrains</groupId>
+    <artifactId>annotations</artifactId>
+    <version>19.0.0</version>
+    <scope>provided</scope>
+</dependency>
+```
+```
+找不到javax.annotation.Nullable的类文件
+缺少 javax.annotation.Nullable
+
+请添加
+<dependency>
+    <groupId>com.google.guava</groupId>
+    <artifactId>guava</artifactId>
+    <version>28.2-jre</version>
+    <scope>provided</scope>
+</dependency>
+
+```

@@ -30,6 +30,7 @@ import org.springframework.core.io.ResourceLoader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -72,15 +73,8 @@ public class JavaDocMojo extends AbstractMojo {
     private File target;
 
 
-    @Parameter(defaultValue = "${project.build.sourceDirectory}", readonly = true)
-    private File sourceDirectory;
-
     @Parameter(defaultValue = "${project.build.outputDirectory}", readonly = true)
     private File outputDirectory;
-
-
-//    @Parameter(defaultValue = "${project.build.outputDirectory}/${project.build.finalName}/WEB-INF/lib")
-//    private File libDir;
 
 
     @Parameter(defaultValue = "${project.compileClasspathElements}", readonly = true, required = true)
@@ -93,12 +87,21 @@ public class JavaDocMojo extends AbstractMojo {
     @Parameter(property = "sourceDir")
     private String sourceDir;
 
+    @Parameter(defaultValue = "${project.build.sourceDirectory}", readonly = true)
+    private File sourceDirectory;
+
 
     /**
      * The dependency tree builder to use.
      */
     @Component(hint = "default")
     private DependencyGraphBuilder dependencyGraphBuilder;
+
+    /**
+     * 导入外部源码文件夹
+     */
+    @Parameter(property = "importSourceDirs")
+    private List<File> importSourceDirs;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -202,9 +205,22 @@ public class JavaDocMojo extends AbstractMojo {
             file = sourceDirectory;
         }
 
+        List<File> sourceDirs = new ArrayList<>(16);
+        sourceDirs.add(file);
+
         System.out.println("当前源码文件夹:" + file.getAbsolutePath());
 
-        JavaDocVO javaDocVO = JavaDocReader.read(file, compilePath);
+        if (importSourceDirs != null) {
+            System.out.println("引入外部源码文件夹:");
+            for (File importSourceDir : importSourceDirs) {
+                System.out.println(importSourceDir);
+                if (importSourceDir.exists()) {
+                    sourceDirs.add(importSourceDir);
+                }
+            }
+        }
+
+        JavaDocVO javaDocVO = JavaDocReader.read(sourceDirs, compilePath);
 
         File docDir = new File(target.getAbsolutePath() + "/docs");
         docDir.mkdirs();

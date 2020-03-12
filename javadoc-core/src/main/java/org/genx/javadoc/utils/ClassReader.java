@@ -35,7 +35,7 @@ public class ClassReader {
         if (env.exist(classDoc.qualifiedTypeName())) {
             return;
         }
-        System.out.println(classDoc.qualifiedTypeName());
+//        System.out.println(classDoc.qualifiedTypeName());
 
         ClassDocVO classDocVO = new ClassDocVO();
         classDocVO.setClassName(classDoc.qualifiedTypeName());

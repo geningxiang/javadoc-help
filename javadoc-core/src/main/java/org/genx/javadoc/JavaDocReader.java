@@ -6,11 +6,12 @@ import com.sun.javadoc.RootDoc;
 import org.apache.commons.lang3.StringUtils;
 import org.genx.javadoc.utils.FileUtil;
 import org.genx.javadoc.utils.JavaDocBuilder;
-import org.genx.javadoc.vo.ClassDocVO;
 import org.genx.javadoc.vo.JavaDocVO;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,18 +37,23 @@ public class JavaDocReader {
     }
 
     public synchronized static JavaDocVO read(File sourceDir, List<String> compilePaths) {
-        ClassDoc[] classes = readWithClassDocs(sourceDir, compilePaths);
+        return read(Arrays.asList(sourceDir), compilePaths);
+    }
+
+    public synchronized static JavaDocVO read(List<File> sourceDirs, List<String> compilePaths) {
+        ClassDoc[] classes = readWithClassDocs(sourceDirs, compilePaths);
         return new JavaDocBuilder().read(classes).build();
     }
 
-    public synchronized static ClassDoc[] readWithClassDocs(File sourceDir, List<String> compilePaths) {
-        javadocExecute(sourceDir, compilePaths);
+
+    public synchronized static ClassDoc[] readWithClassDocs(List<File> sourceDirs, List<String> compilePaths) {
+        javadocExecute(sourceDirs, compilePaths);
         return root.classes();
     }
 
 
-    private static void javadocExecute(File sourceDir, List<String> compilePaths) {
-        List<String> commandList = new ArrayList<>(1024);
+    private static void javadocExecute(List<File> sourceDirs, List<String> compilePaths) {
+        List<String> commandList = new ArrayList<>(2048);
         commandList.add("-doclet");
         commandList.add(Doclet.class.getName());
         commandList.add("-encoding");
@@ -55,13 +61,18 @@ public class JavaDocReader {
         commandList.add("-classpath");
         commandList.add(StringUtils.join(compilePaths, ";"));
 
-        Collection<File> list;
-        if (sourceDir.isDirectory()) {
-            //如果是文件夹 读取文件夹下的所有 .java 文件
-            list = FileUtil.listFiles(sourceDir, file ->
-                    file.isDirectory() || file.getName().toLowerCase().endsWith(".java"), false);
-        } else {
-            list = Arrays.asList(sourceDir);
+        List<File> list = new ArrayList(1024);
+        for (File sourceDir : sourceDirs) {
+            if (sourceDir.exists()) {
+                if (sourceDir.isDirectory()) {
+                    //如果是文件夹 读取文件夹下的所有 .java 文件
+                    list.addAll(FileUtil.listFiles(sourceDir, file ->
+                            file.isDirectory() || file.getName().toLowerCase().endsWith(".java"), false));
+                } else if (sourceDir.getName().toLowerCase().endsWith(".java")) {
+                    list.add(sourceDir);
+                }
+            }
+
         }
 
         if (list.size() == 0) {

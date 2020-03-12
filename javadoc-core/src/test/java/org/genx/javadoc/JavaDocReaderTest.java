@@ -17,6 +17,7 @@ import org.springframework.core.io.ResourceLoader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -108,7 +109,7 @@ public class JavaDocReaderTest {
         }
 
         File sourceDirectory = new File(path + "/../../../javadoc-demo/src/main/java/");
-        ClassDoc[] classDocs = JavaDocReader.readWithClassDocs(sourceDirectory, compilePathList);
+        ClassDoc[] classDocs = JavaDocReader.readWithClassDocs(Arrays.asList(sourceDirectory), compilePathList);
 
 
         for (ClassDoc classDoc : classDocs) {

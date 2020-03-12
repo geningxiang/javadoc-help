@@ -99,7 +99,13 @@
                 <groupId>org.genx.javadoc</groupId>
                 <artifactId>javadoc-mvn-plugin</artifactId>
                 <version>1.1.1-SNAPSHOT</version>
+                <configuration>
+                    <importSourceDirs>
+                        <importSourceDir>${basedir}/../javadoc-core</importSourceDir>
+                    </importSourceDirs>
+                </configuration>
             </plugin>
+
         </plugins>
     </build>
 

@@ -23,6 +23,7 @@ public class DetailedTypeUtil {
     }
 
     public DetailedTypeDoc analysis(TypeDoc typeDoc) {
+
         //记录已解析的类名  避免死循环嵌套
         Map<String, Integer> resolvedMap = new HashMap(16);
         return analysis(typeDoc, resolvedMap);
@@ -111,7 +112,8 @@ public class DetailedTypeUtil {
 
                 String name = CoreUtil.lowCase(method.getMethodName().substring(3));
 
-                TypeDoc typeDoc = method.getReturnType();
+                //这里必须 深度复制
+                TypeDoc typeDoc = method.getReturnType().copy();
                 typeDoc.setName(name);
 
                 field = fieldMap.get(name);

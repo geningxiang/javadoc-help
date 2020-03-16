@@ -111,7 +111,7 @@ public class ClassReader {
         methodDocVO.setClassInfo(null);
         methodDocVO.setClassName(null);
         methodDocVO.setModifierSpecifier(methodDoc.modifierSpecifier());
-        methodDocVO.setComment(methodDoc.commentText());
+        methodDocVO.setComment(methodDoc.getRawCommentText());
         methodDocVO.setAnnotations(AnnotationUtil.readAnnotationMap(methodDoc));
         methodDocVO.setTags(CoreUtil.readTagMap(methodDoc));
 
@@ -150,7 +150,7 @@ public class ClassReader {
     }
 
     public TypeDoc readType(FieldDoc fieldDoc) {
-        return readType(fieldDoc.type(), fieldDoc.name(), fieldDoc.commentText(), fieldDoc.annotations(), CoreUtil.readTagMap(fieldDoc));
+        return readType(fieldDoc.type(), fieldDoc.name(), fieldDoc.getRawCommentText(), fieldDoc.annotations(), CoreUtil.readTagMap(fieldDoc));
     }
 
     public TypeDoc readType(Type type, String name, String comment, AnnotationDesc[] annotations, Map<String, String> tags) {

@@ -10,7 +10,7 @@ import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
- * Description: 
+ * Description:
  * @author genx
  * @date 2020/3/8 14:47
  */
@@ -23,6 +23,7 @@ public class DetailedTypeUtil {
     }
 
     public DetailedTypeDoc analysis(TypeDoc typeDoc) {
+
         //记录已解析的类名  避免死循环嵌套
         Map<String, Integer> resolvedMap = new HashMap(16);
         return analysis(typeDoc, resolvedMap);
@@ -31,6 +32,10 @@ public class DetailedTypeUtil {
     private DetailedTypeDoc analysis(TypeDoc typeDoc, Map<String, Integer> resolvedMap) {
 
         DetailedTypeDoc detailedTypeDoc = DetailedTypeDoc.copyFromTypeDoc(typeDoc);
+        if(resolvedMap.size() == 0){
+            //返回的第一层注释不要
+            detailedTypeDoc.setComment(null);
+        }
 
         ClassDocVO classDoc = env.getClassDoc(typeDoc.getClassName());
         if (classDoc != null) {
@@ -111,7 +116,8 @@ public class DetailedTypeUtil {
 
                 String name = CoreUtil.lowCase(method.getMethodName().substring(3));
 
-                TypeDoc typeDoc = method.getReturnType();
+                //这里必须 深度复制
+                TypeDoc typeDoc = method.getReturnType().copy();
                 typeDoc.setName(name);
 
                 field = fieldMap.get(name);

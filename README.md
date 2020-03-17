@@ -2,70 +2,32 @@
 
 基于com.sun.javadoc解析源码，生成接口文档
 
-当前版本1.1.0-SNAPSHOT，新增泛型解析
- 
-
-## 在线体验
+### 在线体验
 以下是在gitee上找了几个开源项目生成的接口文档
 - [JeecgBoot](http://47.100.63.232:8088/docs/jeecg-boot/index.html)
 - [Guns](http://47.100.63.232:8088/docs/guns/index.html)
 - [RuoYi](http://47.100.63.232:8088/docs/ruoyi/index.html)
 - [zheng](http://47.100.63.232:8088/docs/zheng/index.html)
 
+### 版本说明
 
-```
-/**
-     * 查询用户好友列表
-     * @param userToken 用户令牌
-     */
-    @RequestMapping(value = "/friends", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ResponseEntity<List<User>> friends(String userToken) {
-        return null;
-    }
-```
+| 版本号 | 说明 |
+| :----: | ------ |
+| 1.0.0 | 完成基础解析功能 | 
+| 1.1.0 | 添加泛型解析，新增解析结果的实体类(后续将要持久化) |
+| 1.1.1 | 定义插件，解析各种注解(lombok、jsr-305) | 
+| 1.1.2 | 上传maven不太熟练，不知道怎么删除，只好升个版本号 |
 
-
-暂时只上传了私有仓库,如果要体验只能自己加一下 pluginRepository
-```
-    <!-- 插件仓库地址 -->
-    <pluginRepositories>
-        <!-- 默认先请求阿里云 -->
-        <pluginRepository>
-            <id>aliyun</id>
-            <url>https://maven.aliyun.com/nexus/content/groups/public/</url>
-            <layout>default</layout>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </pluginRepository>
-        <!-- 我的私有仓库地址 -->
-        <pluginRepository>
-            <id>caimao</id>
-            <url>http://60.190.13.162:6118/maven/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-```
+### MAVEN
+最新版已上传至maven中央库
 ```
 <plugin>
-    <groupId>com.genx.javadoc</groupId>
+    <groupId>com.github.geningxiang</groupId>
     <artifactId>javadoc-mvn-plugin</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.2</version>
 </plugin>
 ```
-
+请先对项目做一次package
 ```
-mvn package javadoc-mvn:javaDoc
+mvn javadoc-mvn:javaDoc
 ```
-
-##接下来
-- 梳理一遍新增代码
-- 增加多模块项目的支持

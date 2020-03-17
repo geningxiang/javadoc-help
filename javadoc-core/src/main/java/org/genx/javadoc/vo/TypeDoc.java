@@ -1,5 +1,7 @@
 package org.genx.javadoc.vo;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -86,12 +88,8 @@ public class TypeDoc extends AbsDocVO {
      * @return
      */
     public TypeDoc copy() {
-        TypeDoc typeDoc = new TypeDoc();
-        typeDoc.setName(getName());
-        typeDoc.setDimension(getDimension());
-        typeDoc.setClassName(getClassName());
-        typeDoc.setClassInfo(getClassInfo());
-        return typeDoc;
+        String str = JSONObject.toJSONString(this);
+        return JSONObject.parseObject(str, TypeDoc.class);
     }
 
     public static TypeDoc ofVoid() {

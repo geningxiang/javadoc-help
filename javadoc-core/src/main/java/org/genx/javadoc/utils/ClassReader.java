@@ -11,7 +11,7 @@ import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
- * Description: 
+ * Description:
  * @author genx
  * @date 2020/2/15 14:43
  */
@@ -35,43 +35,46 @@ public class ClassReader {
         if (env.exist(classDoc.qualifiedTypeName())) {
             return;
         }
-//        System.out.println(classDoc.qualifiedTypeName());
 
-        ClassDocVO classDocVO = new ClassDocVO();
-        classDocVO.setClassName(classDoc.qualifiedTypeName());
-        env.add(classDocVO);
+        try {
 
-        //类 修饰数值
-        classDocVO.setModifierSpecifier(classDoc.modifierSpecifier());
+            ClassDocVO classDocVO = new ClassDocVO();
+            classDocVO.setClassName(classDoc.qualifiedTypeName());
+            env.add(classDocVO);
 
-        //注释
-        classDocVO.setComment(classDoc.commentText());
+            //类 修饰数值
+            classDocVO.setModifierSpecifier(classDoc.modifierSpecifier());
 
-        //读取class上的注解
-        classDocVO.setAnnotations(AnnotationUtil.readAnnotationMap(classDoc));
+            //注释
+            classDocVO.setComment(classDoc.commentText());
 
-        classDocVO.setTags(CoreUtil.readTagMap(classDoc));
+            //读取class上的注解
+            classDocVO.setAnnotations(AnnotationUtil.readAnnotationMap(classDoc));
 
-        //判断类是否 实现循环接口
-        classDocVO.setIterable(CoreUtil.isIterable(classDoc));
+            classDocVO.setTags(CoreUtil.readTagMap(classDoc));
 
-        classDocVO.setType(CoreUtil.assertType(classDoc).name());
+            //判断类是否 实现循环接口
+            classDocVO.setIterable(CoreUtil.isIterable(classDoc));
 
-        //类的泛型
-        if (classDoc.typeParameters() != null && classDoc.typeParameters().length > 0) {
-            List<TypeVariableVO> typeVariableVOList = new ArrayList<>(classDoc.typeParameters().length);
-            for (TypeVariable typeVariable : classDoc.typeParameters()) {
-                typeVariableVOList.add(readTypeVariable(typeVariable));
+            classDocVO.setType(CoreUtil.assertType(classDoc).name());
+
+            //类的泛型
+            if (classDoc.typeParameters() != null && classDoc.typeParameters().length > 0) {
+                List<TypeVariableVO> typeVariableVOList = new ArrayList<>(classDoc.typeParameters().length);
+                for (TypeVariable typeVariable : classDoc.typeParameters()) {
+                    typeVariableVOList.add(readTypeVariable(typeVariable));
+                }
+                classDocVO.setTypeParameters(typeVariableVOList);
             }
-            classDocVO.setTypeParameters(typeVariableVOList);
+
+            classDocVO.setFields(readFields(classDoc));
+
+            //类的方法
+            classDocVO.setMethods(readMethods(classDoc));
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        classDocVO.setFields(readFields(classDoc));
-
-        //类的方法
-        classDocVO.setMethods(readMethods(classDoc));
-
-
         //读取内部类
         for (ClassDoc innerClassDoc : classDoc.innerClasses(true)) {
             //只读取public的

@@ -1,9 +1,7 @@
 package org.genx.javadoc;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
@@ -12,13 +10,12 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugins.annotations.*;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
-import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.genx.javadoc.helper.RestApiBuilder;
 import org.genx.javadoc.utils.FileUtil;
 import org.genx.javadoc.utils.ZipUtil;
@@ -94,8 +91,8 @@ public class JavaDocMojo extends AbstractMojo {
     /**
      * The dependency tree builder to use.
      */
-    @Component(hint = "default")
-    private DependencyGraphBuilder dependencyGraphBuilder;
+//    @Component(hint = "default")
+//    private DependencyGraphBuilder dependencyGraphBuilder;
 
     /**
      * 导入外部源码文件夹
@@ -110,76 +107,22 @@ public class JavaDocMojo extends AbstractMojo {
 
         System.out.println("sourceDir=" + sourceDir);
 
-
-        System.out.println(basedir.getAbsolutePath());
-
-        System.out.println(target.getAbsolutePath());
-
-        System.out.println(sourceDirectory);
-
-        System.out.println(outputDirectory);
-
-//        System.out.println(libDir);
-
         System.out.println("compilePath:");
         for (String s : compilePath) {
             System.out.println(s);
         }
-
-//        System.out.println("project.getArtifacts() = " + project.getArtifacts());
-//
-//        System.out.println("project.getDependencyArtifacts() = "+project.getDependencyArtifacts());
-
-        System.out.println("project.getArtifacts() = " + project.getArtifacts());
-        for (Artifact artifact : project.getArtifacts()) {
-            System.out.println(artifact + " | " + artifact.getFile());
-
-        }
-
         System.out.println("##############");
 
-        try {
-
-
-            ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
-
-            buildingRequest.setProject(project);
-
-            ArtifactFilter artifactFilter = createResolvingArtifactFilter();
-
-            // non-verbose mode use dependency graph component, which gives consistent results with Maven version
-            // running
-            DependencyNode rootNode = dependencyGraphBuilder.buildDependencyGraph(buildingRequest, artifactFilter, reactorProjects);
-            //获取依赖树结构
-            System.out.println(JSONObject.toJSONString(rootNode));
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
 //        try {
-//            RepositorySystemSession session = (RepositorySystemSession) ProjectBuildingRequest.class.getMethod("getRepositorySession").invoke(buildingRequest);
-//            System.out.println("## RepositorySystemSession ##");
-//            System.out.println(session);
-//
-//            DependencyResolutionRequest request = new DefaultDependencyResolutionRequest();
-//            request.setMavenProject(project);
-//
-//            DependencyResolutionRequest.class.getMethod("setRepositorySession", RepositorySystemSession.class).invoke(request, session);
-//
-////            //resolve
-////            DependencyResolutionResult result = this.resolveDependencies(request, reactorProjects);
-////            org.eclipse.aether.graph.DependencyNode graph = (org.eclipse.aether.graph.DependencyNode) DependencyResolutionResult.class.getMethod("getDependencyGraph").invoke(request);
-////            System.out.println("graph = " + graph);
-//
-//
-//        } catch (IllegalAccessException e) {
-//            e.printStackTrace();
-//        } catch (InvocationTargetException e) {
-//            e.printStackTrace();
-//        } catch (NoSuchMethodException e) {
+//            ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
+//            buildingRequest.setProject(project);
+//            ArtifactFilter artifactFilter = createResolvingArtifactFilter();
+//            // non-verbose mode use dependency graph component, which gives consistent results with Maven version
+//            // running
+//            DependencyNode rootNode = dependencyGraphBuilder.buildDependencyGraph(buildingRequest, artifactFilter, reactorProjects);
+//            //获取依赖树结构
+//            System.out.println(JSONObject.toJSONString(rootNode));
+//        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
 

@@ -168,9 +168,8 @@ public class JavaDocMojo extends AbstractMojo {
         File docDir = new File(target.getAbsolutePath() + "/docs");
         docDir.mkdirs();
 
-//        String json = JSONObject.toJSONString(map);
-//        File file1 = new File(target.getAbsolutePath() + "/docs/javadoc.json");
-//        FileUtil.writeFile(file1, json);
+        File file1 = new File(target.getAbsolutePath() + "/docs/javadoc.json");
+        FileUtil.writeFile(file1, JSON.toJSONString(javaDocVO.getClassDocs().values()));
 //
 //        File file2 = new File(target.getAbsolutePath() + "/docs/javadoc.js");
 //        FileUtil.writeFile(file2, "var javadoc = " + json + ";");

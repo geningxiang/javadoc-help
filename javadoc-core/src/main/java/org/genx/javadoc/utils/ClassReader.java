@@ -139,7 +139,7 @@ public class ClassReader {
         }
 
         //解析返回类型
-        methodDocVO.setReturnType(readType(methodDoc.returnType(), "", returnComment, null, null));
+        methodDocVO.setReturnType(readType(methodDoc.returnType(), "", returnComment, null, null, 0));
 
         //方法的显式抛出异常
         methodDocVO.setThrowExpections(CoreUtil.readThrowExpections(methodDoc));
@@ -149,14 +149,14 @@ public class ClassReader {
 
 
     public TypeDoc readType(Parameter parameter, String comment) {
-        return readType(parameter.type(), parameter.name(), comment, parameter.annotations(), null);
+        return readType(parameter.type(), parameter.name(), comment, parameter.annotations(), null, 0);
     }
 
     public TypeDoc readType(FieldDoc fieldDoc) {
-        return readType(fieldDoc.type(), fieldDoc.name(), fieldDoc.commentText(), fieldDoc.annotations(), CoreUtil.readTagMap(fieldDoc));
+        return readType(fieldDoc.type(), fieldDoc.name(), fieldDoc.commentText(), fieldDoc.annotations(), CoreUtil.readTagMap(fieldDoc), fieldDoc.modifierSpecifier());
     }
 
-    public TypeDoc readType(Type type, String name, String comment, AnnotationDesc[] annotations, Map<String, String> tags) {
+    public TypeDoc readType(Type type, String name, String comment, AnnotationDesc[] annotations, Map<String, String> tags, int modifierSpecifier) {
         onTypeReaded(type);
 
         TypeDoc typeDoc = new TypeDoc();
@@ -168,7 +168,7 @@ public class ClassReader {
         typeDoc.setAnnotations(AnnotationUtil.readAnnotationMap(annotations));
         typeDoc.setTags(tags);
         typeDoc.setParameteres(CoreUtil.readParameteres(type));
-
+        typeDoc.setModifierSpecifier(modifierSpecifier);
         return typeDoc;
     }
 

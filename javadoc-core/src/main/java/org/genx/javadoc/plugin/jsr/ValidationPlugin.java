@@ -87,6 +87,15 @@ public class ValidationPlugin implements IJavaDocPlugin {
                         method.getReturnType().addLimits(limits);
                     }
                 }
+
+                if (method.getParams() != null) {
+                    for (TypeDoc param : method.getParams()) {
+                        limits = readValidAnnoaation(param);
+                        if (limits != null) {
+                            param.addLimits(limits);
+                        }
+                    }
+                }
             }
 
         }

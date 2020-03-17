@@ -139,6 +139,10 @@ public class SpringMVCPlugin implements IRestApiPlugin {
         }
 
         doc.setReturnBody(detailedTypeUtil.analysis(methodDocVO.getReturnType()));
+        if(doc.getReturnBody() != null){
+            //删除 method 返回的类型第一级的注释
+            doc.getReturnBody().setComment(null);
+        }
         doc.setReturnComment(methodDocVO.getReturnComment());
         return doc;
     }

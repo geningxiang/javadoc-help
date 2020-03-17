@@ -32,10 +32,6 @@ public class DetailedTypeUtil {
     private DetailedTypeDoc analysis(TypeDoc typeDoc, Map<String, Integer> resolvedMap) {
 
         DetailedTypeDoc detailedTypeDoc = DetailedTypeDoc.copyFromTypeDoc(typeDoc);
-        if(resolvedMap.size() == 0){
-            //返回的第一层注释不要
-            detailedTypeDoc.setComment(null);
-        }
 
         ClassDocVO classDoc = env.getClassDoc(typeDoc.getClassName());
         if (classDoc != null) {

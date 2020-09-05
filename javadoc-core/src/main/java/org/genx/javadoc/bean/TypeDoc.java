@@ -1,12 +1,6 @@
-package org.genx.javadoc.vo;
+package org.genx.javadoc.bean;
 
 import com.alibaba.fastjson.JSONObject;
-import org.genx.javadoc.bean.TypeParameterizedDoc;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,7 +9,7 @@ import java.util.Set;
  * @date 2020/2/23 16:44
  */
 
-public class TypeDoc extends AbsDocVO {
+public class TypeDoc extends AbsDoc {
 
 
     /**
@@ -32,13 +26,8 @@ public class TypeDoc extends AbsDocVO {
     /**
      * 指定的泛型
      */
-    private TypeParameterizedDoc[] parameteres;
+    private TypeParameterizedDoc[] parameters;
 
-    /**
-     * 限制
-     * 例如 required notNull email 等 一般是JSR-303 读出来的
-     */
-    private Set<String> limits;
 
     public String getName() {
         return name;
@@ -56,32 +45,12 @@ public class TypeDoc extends AbsDocVO {
         this.dimension = dimension;
     }
 
-    public TypeParameterizedDoc[] getParameteres() {
-        return parameteres;
+    public TypeParameterizedDoc[] getParameters() {
+        return parameters;
     }
 
-    public void setParameteres(TypeParameterizedDoc[] parameteres) {
-        this.parameteres = parameteres;
-    }
-
-    public Set<String> getLimits() {
-        return limits;
-    }
-
-    public void setLimits(Set<String> limits) {
-        this.limits = limits;
-    }
-
-
-    public void addLimit(String limit) {
-        addLimits(Arrays.asList(limit));
-    }
-
-    public void addLimits(Collection<String> limits) {
-        if (this.limits == null) {
-            this.limits = new HashSet();
-        }
-        this.limits.addAll(limits);
+    public void setParameters(TypeParameterizedDoc[] parameters) {
+        this.parameters = parameters;
     }
 
     /**

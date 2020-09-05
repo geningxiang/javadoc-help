@@ -3,7 +3,7 @@ package org.genx.javadoc.utils;
 import com.sun.javadoc.*;
 import org.apache.commons.lang3.StringUtils;
 import org.genx.javadoc.contants.RoughlyType;
-import org.genx.javadoc.vo.TypeParameterizedDoc;
+import org.genx.javadoc.bean.TypeParameterizedDoc;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -140,23 +140,7 @@ public class CoreUtil {
         return RoughlyType.Object;
     }
 
-    public static Map<String, String> readTagMap(Doc type) {
-        if (type.tags() != null && type.tags().length > 0) {
-            Map<String, String> tagMap = new HashMap(16);
-            String tmp;
-            for (Tag tag : type.tags()) {
-                tmp = tagMap.get(tag.name());
-                if (StringUtils.isNotBlank(tmp)) {
-                    tmp = tmp + System.lineSeparator() + tag.text();
-                } else {
-                    tmp = tag.text();
-                }
-                tagMap.put(tag.name(), tmp);
-            }
-            return tagMap;
-        }
-        return null;
-    }
+
 
     /**
      * 读取指定的泛型
@@ -172,8 +156,9 @@ public class CoreUtil {
                 TypeParameterizedDoc typeParameterizedDoc = new TypeParameterizedDoc();
                 typeParameterizedDoc.setText(item.toString());
                 typeParameterizedDoc.setClassName(item.qualifiedTypeName());
+                // item.dimension() 返回 "" "[]" "[][]"
                 typeParameterizedDoc.setDimension(item.dimension().length() / 2 + 1);
-                typeParameterizedDoc.setParameteres(readParameteres(item));
+                typeParameterizedDoc.setParameters(readParameteres(item));
                 array[i] = typeParameterizedDoc;
             }
             return array;

@@ -3,7 +3,7 @@
 //import com.sun.javadoc.*;
 //import org.apache.commons.lang3.StringUtils;
 //import org.genx.javadoc.vo.TypeDoc;
-//import org.genx.javadoc.vo.TypeParameterizedDoc;
+//import org.genx.javadoc.bean.TypeParameterizedDoc;
 //
 //import java.lang.reflect.Modifier;
 //import java.util.*;

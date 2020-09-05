@@ -1,12 +1,17 @@
 package org.genx.javadoc.utils;
 
-import com.sun.javadoc.*;
-import org.genx.javadoc.vo.ClassDocVO;
-import org.genx.javadoc.vo.MethodDocVO;
-import org.genx.javadoc.vo.TypeDoc;
-import org.genx.javadoc.vo.TypeVariableVO;
+import com.sun.javadoc.Parameter;
+import com.sun.javadoc.Tag;
+import org.genx.javadoc.bean.ClassDoc;
+import org.genx.javadoc.bean.MethodDoc;
+import org.genx.javadoc.bean.TypeDoc;
+import org.genx.javadoc.bean.TypeVariableDoc;
+import org.genx.javadoc.proto.JavaDocProto;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -24,21 +29,21 @@ public class ClassReader {
     }
 
 
-    public void read(Collection<ClassDoc> classDocs) {
-        for (ClassDoc classDoc : classDocs) {
+    public void read() {
+        for (com.sun.javadoc.ClassDoc classDoc : env.getClassDocMap().values()) {
             read(classDoc);
         }
     }
 
 
-    public void read(ClassDoc classDoc) {
+    public void read(com.sun.javadoc.ClassDoc classDoc) {
         if (env.exist(classDoc.qualifiedTypeName())) {
+            //已解析
             return;
         }
-
         try {
 
-            ClassDocVO classDocVO = new ClassDocVO();
+            ClassDoc classDocVO = new ClassDoc();
             classDocVO.setClassName(classDoc.qualifiedTypeName());
             env.add(classDocVO);
 
@@ -46,22 +51,22 @@ public class ClassReader {
             classDocVO.setModifierSpecifier(classDoc.modifierSpecifier());
 
             //注释
-            classDocVO.setComment(classDoc.commentText());
+            classDocVO.setComment(CommentUtil.read(classDoc.inlineTags()));
+            //注释中的 tag   @author @date  等
+            classDocVO.setTags(CommentUtil.readTagWithMap(classDoc.tags()));
 
             //读取class上的注解
             classDocVO.setAnnotations(AnnotationUtil.readAnnotationMap(classDoc));
 
-            classDocVO.setTags(CoreUtil.readTagMap(classDoc));
-
             //判断类是否 实现循环接口
-            classDocVO.setIterable(CoreUtil.isIterable(classDoc));
+//            classDocVO.setIterable(CoreUtil.isIterable(classDoc));
 
-            classDocVO.setType(CoreUtil.assertType(classDoc).name());
+//            classDocVO.setType(CoreUtil.assertType(classDoc).name());
 
             //类的泛型
             if (classDoc.typeParameters() != null && classDoc.typeParameters().length > 0) {
-                List<TypeVariableVO> typeVariableVOList = new ArrayList<>(classDoc.typeParameters().length);
-                for (TypeVariable typeVariable : classDoc.typeParameters()) {
+                List<TypeVariableDoc> typeVariableVOList = new ArrayList(classDoc.typeParameters().length);
+                for (com.sun.javadoc.TypeVariable typeVariable : classDoc.typeParameters()) {
                     typeVariableVOList.add(readTypeVariable(typeVariable));
                 }
                 classDocVO.setTypeParameters(typeVariableVOList);
@@ -76,70 +81,66 @@ public class ClassReader {
             e.printStackTrace();
         }
         //读取内部类
-        for (ClassDoc innerClassDoc : classDoc.innerClasses(true)) {
+        for (com.sun.javadoc.ClassDoc innerClassDoc : classDoc.innerClasses(true)) {
             //只读取public的
             read(innerClassDoc);
         }
     }
 
-    private TypeVariableVO readTypeVariable(TypeVariable typeVariable) {
-        TypeVariableVO typeVariableVO = new TypeVariableVO();
+    private TypeVariableDoc readTypeVariable(com.sun.javadoc.TypeVariable typeVariable) {
+        TypeVariableDoc typeVariableVO = new TypeVariableDoc();
         typeVariableVO.setName(typeVariable.typeName());
         typeVariableVO.setDescription(typeVariable.toString());
         return typeVariableVO;
     }
 
-    private List<TypeDoc> readFields(ClassDoc classDoc) {
-        FieldDoc[] fieldDocs = classDoc.fields(false);
+    /**
+     * 读取类的变量
+     * @param classDoc
+     * @return
+     */
+    private List<TypeDoc> readFields(com.sun.javadoc.ClassDoc classDoc) {
+        com.sun.javadoc.FieldDoc[] fieldDocs = classDoc.fields(false);
         List<TypeDoc> fields = new ArrayList(fieldDocs.length);
-        for (FieldDoc fieldDoc : fieldDocs) {
+        for (com.sun.javadoc.FieldDoc fieldDoc : fieldDocs) {
             fields.add(readType(fieldDoc));
         }
         return fields;
     }
 
 
-    private List<MethodDocVO> readMethods(ClassDoc classDoc) {
-        MethodDoc[] methodDocs = classDoc.methods(false);
-        List<MethodDocVO> methods = new ArrayList(methodDocs.length);
-        for (MethodDoc methodDoc : methodDocs) {
+    private List<MethodDoc> readMethods(com.sun.javadoc.ClassDoc classDoc) {
+        com.sun.javadoc.MethodDoc[] methodDocs = classDoc.methods(false);
+        List<MethodDoc> methods = new ArrayList(methodDocs.length);
+        for (com.sun.javadoc.MethodDoc methodDoc : methodDocs) {
             methods.add(readMethod(methodDoc));
         }
         return methods;
     }
 
-    private MethodDocVO readMethod(MethodDoc methodDoc) {
-        MethodDocVO methodDocVO = new MethodDocVO();
+    private MethodDoc readMethod(com.sun.javadoc.MethodDoc methodDoc) {
+        MethodDoc methodDocVO = new MethodDoc();
         methodDocVO.setMethodName(methodDoc.name());
-        methodDocVO.setClassInfo(null);
-        methodDocVO.setClassName(null);
         methodDocVO.setModifierSpecifier(methodDoc.modifierSpecifier());
-        methodDocVO.setComment(methodDoc.commentText());
+        methodDocVO.setComment(CommentUtil.read(methodDoc.inlineTags()));
         methodDocVO.setAnnotations(AnnotationUtil.readAnnotationMap(methodDoc));
-        methodDocVO.setTags(CoreUtil.readTagMap(methodDoc));
+        methodDocVO.setTags(CommentUtil.readTagWithMap(methodDoc.tags()));
 
         //读取参数
         List<TypeDoc> params = new ArrayList<>(methodDoc.parameters().length);
         //读取参数注释
-        Map<String, String> paramCommentMap = new HashMap(16);
-        for (ParamTag paramTag : methodDoc.paramTags()) {
-            paramCommentMap.put(paramTag.parameterName(), paramTag.parameterComment());
+        Map<String, Tag[]> paramCommentMap = new HashMap(16);
+        for (com.sun.javadoc.ParamTag paramTag : methodDoc.paramTags()) {
+            paramCommentMap.put(paramTag.parameterName(), paramTag.inlineTags());
         }
         for (Parameter parameter : methodDoc.parameters()) {
-            //为每个参数 添加上注释
-            params.add(readType(parameter, paramCommentMap.get(parameter.name())));
+
+            params.add(readType(parameter.type(), parameter.name(), paramCommentMap.get(parameter.name()), parameter.annotations(), null, 0));
         }
         methodDocVO.setParams(params);
 
-        //读取 return 注释
-        String returnComment = null;
-        Tag[] returnTags = methodDoc.tags("return");
-        if (returnTags.length > 0) {
-            returnComment = returnTags[0].text();
-        }
-
         //解析返回类型
-        methodDocVO.setReturnType(readType(methodDoc.returnType(), "", returnComment, null, null, 0));
+        methodDocVO.setReturnType(readType(methodDoc.returnType(), "", methodDoc.tags("return"), null, null, 0));
 
         //方法的显式抛出异常
         methodDocVO.setThrowExpections(CoreUtil.readThrowExpections(methodDoc));
@@ -147,32 +148,27 @@ public class ClassReader {
         return methodDocVO;
     }
 
-
-    public TypeDoc readType(Parameter parameter, String comment) {
-        return readType(parameter.type(), parameter.name(), comment, parameter.annotations(), null, 0);
+    public TypeDoc readType(com.sun.javadoc.FieldDoc fieldDoc) {
+        return readType(fieldDoc.type(), fieldDoc.name(), fieldDoc.inlineTags(), fieldDoc.annotations(), fieldDoc.tags(), fieldDoc.modifierSpecifier());
     }
 
-    public TypeDoc readType(FieldDoc fieldDoc) {
-        return readType(fieldDoc.type(), fieldDoc.name(), fieldDoc.commentText(), fieldDoc.annotations(), CoreUtil.readTagMap(fieldDoc), fieldDoc.modifierSpecifier());
-    }
-
-    public TypeDoc readType(Type type, String name, String comment, AnnotationDesc[] annotations, Map<String, String> tags, int modifierSpecifier) {
+    public TypeDoc readType(com.sun.javadoc.Type type, String name, Tag[] inlineTags, com.sun.javadoc.AnnotationDesc[] annotations, Tag[] tags, int modifierSpecifier) {
         onTypeReaded(type);
 
         TypeDoc typeDoc = new TypeDoc();
         typeDoc.setClassInfo(type.toString());
         typeDoc.setClassName(type.qualifiedTypeName());
         typeDoc.setName(name);
-        typeDoc.setComment(comment);
+        typeDoc.setComment(CommentUtil.read(inlineTags));
         typeDoc.setDimension(type.dimension().length() / 2 + 1);
         typeDoc.setAnnotations(AnnotationUtil.readAnnotationMap(annotations));
-        typeDoc.setTags(tags);
-        typeDoc.setParameteres(CoreUtil.readParameteres(type));
+        typeDoc.setTags(CommentUtil.readTagWithMap(tags));
+        typeDoc.setParameters(CoreUtil.readParameteres(type));
         typeDoc.setModifierSpecifier(modifierSpecifier);
         return typeDoc;
     }
 
-    private void onTypeReaded(Type type) {
+    private void onTypeReaded(com.sun.javadoc.Type type) {
         if (type != null && type.asClassDoc() != null) {
             read(type.asClassDoc());
         }

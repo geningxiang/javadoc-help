@@ -1,9 +1,8 @@
 package org.genx.javadoc.utils;
 
-import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationTypeElementDoc;
 import com.sun.javadoc.ProgramElementDoc;
-import org.genx.javadoc.vo.AnnotationDocVO;
+import org.genx.javadoc.bean.AnnotationDesc;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,23 +16,22 @@ import java.util.Map;
  */
 public class AnnotationUtil {
 
-    public static Map<String, AnnotationDocVO> readAnnotationMap(ProgramElementDoc doc) {
+    public static Map<String, AnnotationDesc> readAnnotationMap(ProgramElementDoc doc) {
         return readAnnotationMap(doc.annotations());
     }
 
-    public static Map<String, AnnotationDocVO> readAnnotationMap(AnnotationDesc[] annotationDescs) {
+    public static Map<String, AnnotationDesc> readAnnotationMap(com.sun.javadoc.AnnotationDesc[] annotationDescs) {
         if (annotationDescs == null || annotationDescs.length == 0) {
             return null;
         }
-        Map<String, AnnotationDocVO> map = new HashMap<>(8);
-        for (AnnotationDesc annotation : annotationDescs) {
-            AnnotationDocVO annotationVO = new AnnotationDocVO();
+        Map<String, AnnotationDesc> map = new HashMap<>(8);
+        for (com.sun.javadoc.AnnotationDesc annotation : annotationDescs) {
+            AnnotationDesc annotationVO = new AnnotationDesc();
             annotationVO.setName(annotation.annotationType().name());
-            annotationVO.setText(annotation.toString());
-            annotationVO.setClassName(annotation.annotationType().qualifiedTypeName());
-
+//            annotationVO.setText(annotation.toString());
+            annotationVO.setQualifiedName(annotation.annotationType().qualifiedTypeName());
             Map<String, String[]> data = new HashMap<>(8);
-            for (AnnotationDesc.ElementValuePair elementValuePair : annotation.elementValues()) {
+            for (com.sun.javadoc.AnnotationDesc.ElementValuePair elementValuePair : annotation.elementValues()) {
                 data.put(elementValuePair.element().name(), parseObjectToStringArray(elementValuePair.value().value()));
             }
             //设置默认值

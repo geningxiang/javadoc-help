@@ -1,4 +1,6 @@
-package org.genx.javadoc.vo;
+package org.genx.javadoc.bean;
+
+import java.io.Serializable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -6,7 +8,7 @@ package org.genx.javadoc.vo;
  * @author genx
  * @date 2020/3/7 17:54
  */
-public class TypeParameterizedDoc {
+public class TypeParameterizedDoc implements Serializable {
 
     private String text;
 
@@ -19,7 +21,7 @@ public class TypeParameterizedDoc {
     private int dimension = 1;
 
 
-    private TypeParameterizedDoc[] parameteres;
+    private TypeParameterizedDoc[] parameters;
 
     public String getText() {
         return text;
@@ -45,11 +47,11 @@ public class TypeParameterizedDoc {
         this.dimension = dimension;
     }
 
-    public TypeParameterizedDoc[] getParameteres() {
-        return parameteres;
+    public TypeParameterizedDoc[] getParameters() {
+        return parameters;
     }
 
-    public void setParameteres(TypeParameterizedDoc[] parameteres) {
-        this.parameteres = parameteres;
+    public void setParameters(TypeParameterizedDoc[] parameters) {
+        this.parameters = parameters;
     }
 }

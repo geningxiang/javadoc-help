@@ -4,6 +4,7 @@ import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.LanguageVersion;
 import com.sun.javadoc.RootDoc;
 import org.apache.commons.lang3.StringUtils;
+import org.genx.javadoc.bean.JavaDoc;
 import org.genx.javadoc.utils.FileUtil;
 import org.genx.javadoc.utils.JavaDocBuilder;
 import org.genx.javadoc.vo.JavaDocVO;
@@ -36,13 +37,13 @@ public class JavaDocReader {
         }
     }
 
-    public synchronized static JavaDocVO read(File sourceDir, List<String> compilePaths) {
+    public synchronized static JavaDoc read(File sourceDir, List<String> compilePaths) {
         return read(Arrays.asList(sourceDir), compilePaths);
     }
 
-    public synchronized static JavaDocVO read(List<File> sourceDirs, List<String> compilePaths) {
+    public synchronized static JavaDoc read(List<File> sourceDirs, List<String> compilePaths) {
         ClassDoc[] classes = readWithClassDocs(sourceDirs, compilePaths);
-        return new JavaDocBuilder().read(classes).build();
+        return new JavaDocBuilder(classes).build();
     }
 
 

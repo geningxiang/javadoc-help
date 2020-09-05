@@ -4,10 +4,7 @@ import org.genx.javadoc.common.Page;
 import org.genx.javadoc.common.ResponseEntity;
 import org.genx.javadoc.entity.AppConfigure;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +28,7 @@ public class AppController {
      */
     @ResponseBody
     @RequestMapping(value = {"/home", "/homeIndex"}, method = {RequestMethod.GET, RequestMethod.POST}, produces = "application/json;charset=UTF-8")
-    public ResponseEntity<List<AppConfigure>> homeInfo(Integer clientType, String version, String channel) {
+    public ResponseEntity<List<AppConfigure>> homeInfo(@RequestParam("clientType") Integer clientType, String version, String channel) {
         return null;
     }
 

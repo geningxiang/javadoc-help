@@ -1,6 +1,7 @@
 package org.genx.javadoc.utils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.genx.javadoc.bean.TypeParameterizedDoc;
 import org.genx.javadoc.contants.RoughlyType;
 import org.genx.javadoc.vo.*;
 import org.springframework.beans.BeanUtils;
@@ -67,7 +68,7 @@ public class DetailedTypeUtil {
             item.setClassInfo(itemParameterizedDoc.getText());
             item.setClassName(itemParameterizedDoc.getClassName());
             item.setDimension(itemParameterizedDoc.getDimension());
-            item.setParameteres(itemParameterizedDoc.getParameteres());
+            item.setParameteres(itemParameterizedDoc.getParameters());
             ClassDocVO itemClassDoc = env.getClassDoc(itemParameterizedDoc.getClassName());
             if (itemClassDoc != null && RoughlyType.Object.name().equals(itemClassDoc.getType())) {
                 analysisObject(item, itemClassDoc, resolvedMap);
@@ -156,7 +157,7 @@ public class DetailedTypeUtil {
         if (typeParameterizedDoc != null) {
             typeDoc.setClassName(typeParameterizedDoc.getClassName());
             typeDoc.setClassInfo(typeParameterizedDoc.getText());
-            typeDoc.setParameteres(typeParameterizedDoc.getParameteres());
+            typeDoc.setParameteres(typeParameterizedDoc.getParameters());
             typeDoc.setDimension(typeParameterizedDoc.getDimension());
         } else if (typeDoc.getParameteres() != null && typeDoc.getParameteres().length > 0) {
             matchTypeParameter(typeDoc.getParameteres(), typeParameterizedDocMap);
@@ -175,8 +176,8 @@ public class DetailedTypeUtil {
             temp = typeParameterizedDocMap.get(typeParameterizedDoc.getClassName());
             if (temp != null) {
                 BeanUtils.copyProperties(temp, typeParameterizedDoc);
-            } else if (typeParameterizedDoc.getParameteres() != null && typeParameterizedDoc.getParameteres().length > 0) {
-                matchTypeParameter(typeParameterizedDoc.getParameteres(), typeParameterizedDocMap);
+            } else if (typeParameterizedDoc.getParameters() != null && typeParameterizedDoc.getParameters().length > 0) {
+                matchTypeParameter(typeParameterizedDoc.getParameters(), typeParameterizedDocMap);
             }
         }
     }

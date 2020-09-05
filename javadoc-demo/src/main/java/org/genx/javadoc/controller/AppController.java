@@ -27,7 +27,7 @@ public class AppController {
      * @param channel 渠道名称
      */
     @ResponseBody
-    @RequestMapping(value = {"/home", "/homeIndex"}, method = {RequestMethod.GET, RequestMethod.POST}, produces = "application/json;charset=UTF-8")
+    @RequestMapping(name="获取APP首页数据", value = {"/home", "/homeIndex"}, method = {RequestMethod.GET, RequestMethod.POST}, produces = "application/json;charset=UTF-8")
     public ResponseEntity<List<AppConfigure>> homeInfo(@RequestParam("clientType") Integer clientType, String version, String channel) {
         return null;
     }

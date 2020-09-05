@@ -29,6 +29,7 @@
         <fastjson.version>1.2.72</fastjson.version>
         <commons-lang3.version>3.9</commons-lang3.version>
         <commons-codec.version>1.11</commons-codec.version>
+        <commons-io.version>2.6</commons-io.version>
         <junit.version>4.12</junit.version>
         <lombok.version>1.18.12</lombok.version>
 
@@ -82,61 +83,17 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.6</version>
+            <version>${commons-io.version}</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>3.13.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java-util</artifactId>
-            <version>3.13.0</version>
         </dependency>
 
     </dependencies>
 
 
     <build>
-        <extensions>
-            <extension>
-                <groupId>kr.motd.maven</groupId>
-                <artifactId>os-maven-plugin</artifactId><!--引入操作系统os设置的属性插件,否则${os.detected.classifier} 操作系统版本会找不到 -->
-                <version>1.5.0.Final</version>
-            </extension>
-        </extensions>
         <plugins>
-            <plugin>
-                <groupId>org.xolstice.maven.plugins</groupId>
-                <artifactId>protobuf-maven-plugin</artifactId>
-                <version>0.5.0</version>
-                <configuration>
-                    <!--
-                      The version of protoc must match protobuf-java. If you don't depend on
-                      protobuf-java directly, you will be transitively depending on the
-                      protobuf-java version that grpc depends on.
-                    -->
-                    <protocArtifact>com.google.protobuf:protoc:3.13.0:exe:${os.detected.classifier}
-                    </protocArtifact>
-                    <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.7.0:exe:${os.detected.classifier}
-                    </pluginArtifact>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>compile-custom</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
-
 
 
     <!-- deploy到私有仓库 -->
@@ -152,6 +109,5 @@
             <url>http://60.190.13.162:6118/maven/</url>
         </snapshotRepository>
     </distributionManagement>
-
 
 </project>

@@ -3,10 +3,7 @@ package org.genx.javadoc.vo;
 import com.alibaba.fastjson.JSONObject;
 import org.genx.javadoc.bean.TypeParameterizedDoc;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,6 +14,37 @@ import java.util.Set;
 
 public class TypeDoc extends AbsDocVO {
 
+    /**
+     * 类名
+     */
+    protected String className;
+
+    /**
+     * 类名(带泛型)
+     */
+    protected String classInfo;
+
+    /**
+     * 修饰符数值
+     */
+    private int modifierSpecifier;
+
+    /**
+     * 注解
+     * key 注解的类名
+     */
+    protected Map<String, AnnotationDocVO> annotations;
+
+    /**
+     * 注释 带换行符的
+     */
+    protected String comment;
+
+    /**
+     * 注释标签
+     * 例如 @ param
+     */
+    protected Map<String, String> tags;
 
     /**
      * 名称

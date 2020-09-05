@@ -2,16 +2,13 @@ package org.genx.javadoc.utils;
 
 import com.sun.javadoc.Parameter;
 import com.sun.javadoc.Tag;
+import com.sun.javadoc.Type;
 import org.genx.javadoc.bean.ClassDoc;
 import org.genx.javadoc.bean.MethodDoc;
 import org.genx.javadoc.bean.TypeDoc;
 import org.genx.javadoc.bean.TypeVariableDoc;
-import org.genx.javadoc.proto.JavaDocProto;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -36,32 +33,35 @@ public class ClassReader {
     }
 
 
-    public void read(com.sun.javadoc.ClassDoc classDoc) {
-        if (env.exist(classDoc.qualifiedTypeName())) {
+    public ClassDoc read(com.sun.javadoc.ClassDoc classDoc) {
+        ClassDoc classDocVO = env.get(classDoc.qualifiedTypeName());
+        if (classDocVO != null) {
             //已解析
-            return;
+            return classDocVO;
         }
+        classDocVO = new ClassDoc();
+        classDocVO.setClassName(classDoc.qualifiedTypeName());
+        //先将引用添加进去 占个位置
+        env.add(classDocVO);
+
         try {
 
-            ClassDoc classDocVO = new ClassDoc();
-            classDocVO.setClassName(classDoc.qualifiedTypeName());
-            env.add(classDocVO);
+            tryExtendFromParent( classDocVO, classDoc);
 
-            //类 修饰数值
+            //类的修饰数值
             classDocVO.setModifierSpecifier(classDoc.modifierSpecifier());
 
-            //注释
+            //实现的接口
+            classDocVO.setInterfaceTypes(InterfaceTypeUtil.readInterfaceTypes(classDoc));
+
+            //类注释
             classDocVO.setComment(CommentUtil.read(classDoc.inlineTags()));
-            //注释中的 tag   @author @date  等
+
+            //tag注释   @author @date  等
             classDocVO.setTags(CommentUtil.readTagWithMap(classDoc.tags()));
 
             //读取class上的注解
             classDocVO.setAnnotations(AnnotationUtil.readAnnotationMap(classDoc));
-
-            //判断类是否 实现循环接口
-//            classDocVO.setIterable(CoreUtil.isIterable(classDoc));
-
-//            classDocVO.setType(CoreUtil.assertType(classDoc).name());
 
             //类的泛型
             if (classDoc.typeParameters() != null && classDoc.typeParameters().length > 0) {
@@ -72,20 +72,34 @@ public class ClassReader {
                 classDocVO.setTypeParameters(typeVariableVOList);
             }
 
+            //类的字段
             classDocVO.setFields(readFields(classDoc));
 
             //类的方法
             classDocVO.setMethods(readMethods(classDoc));
+
 
         } catch (Exception e) {
             e.printStackTrace();
         }
         //读取内部类
         for (com.sun.javadoc.ClassDoc innerClassDoc : classDoc.innerClasses(true)) {
-            //只读取public的
+            //暂时只读取public的
             read(innerClassDoc);
         }
+        return classDocVO;
     }
+
+    private void tryExtendFromParent(ClassDoc classDocVO, com.sun.javadoc.ClassDoc classDoc){
+        if(classDoc.superclass() != null && !Object.class.getName().equals(classDoc.superclass().qualifiedTypeName())){
+            ClassDoc parentVO = read(classDoc.superclass());
+
+            classDocVO.setFields(parentVO.getFields());
+
+            classDocVO.setMethods(parentVO.getMethods());
+        }
+    }
+
 
     private TypeVariableDoc readTypeVariable(com.sun.javadoc.TypeVariable typeVariable) {
         TypeVariableDoc typeVariableVO = new TypeVariableDoc();
@@ -99,23 +113,41 @@ public class ClassReader {
      * @param classDoc
      * @return
      */
-    private List<TypeDoc> readFields(com.sun.javadoc.ClassDoc classDoc) {
+    private Map<String, TypeDoc> readFields(com.sun.javadoc.ClassDoc classDoc) {
         com.sun.javadoc.FieldDoc[] fieldDocs = classDoc.fields(false);
-        List<TypeDoc> fields = new ArrayList(fieldDocs.length);
+        Map<String, TypeDoc> fields = new TreeMap();
         for (com.sun.javadoc.FieldDoc fieldDoc : fieldDocs) {
-            fields.add(readType(fieldDoc));
+            TypeDoc typeDoc = readType(fieldDoc);
+            fields.put(typeDoc.getName(), typeDoc);
         }
         return fields;
     }
 
 
-    private List<MethodDoc> readMethods(com.sun.javadoc.ClassDoc classDoc) {
+    private Map<String, MethodDoc> readMethods(com.sun.javadoc.ClassDoc classDoc) {
         com.sun.javadoc.MethodDoc[] methodDocs = classDoc.methods(false);
-        List<MethodDoc> methods = new ArrayList(methodDocs.length);
+        Map<String, MethodDoc> methods = new TreeMap();
         for (com.sun.javadoc.MethodDoc methodDoc : methodDocs) {
-            methods.add(readMethod(methodDoc));
+            MethodDoc m = readMethod(methodDoc);
+            methods.put(getMethodQualifiedName(methodDoc), m);
         }
         return methods;
+    }
+    
+    private String getMethodQualifiedName(com.sun.javadoc.MethodDoc methodDoc){
+        StringBuilder name = new StringBuilder(64);
+        name.append(methodDoc.name());
+        name.append("(");
+        if(methodDoc.parameters()!= null){
+            for (int i = 0; i < methodDoc.parameters().length; i++) {
+                if(i > 0){
+                    name.append(",");
+                }
+                name.append(methodDoc.parameters()[i].type().qualifiedTypeName());
+            }
+        }
+        name.append(")");
+        return name.toString();
     }
 
     private MethodDoc readMethod(com.sun.javadoc.MethodDoc methodDoc) {

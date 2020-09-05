@@ -1,18 +1,17 @@
 package org.genx.javadoc.helper;
 
 import org.genx.javadoc.plugin.IRestApiPlugin;
-import org.genx.javadoc.vo.ClassDocVO;
+import org.genx.javadoc.plugin.springmvc.SpringMVCPlugin;
 import org.genx.javadoc.vo.JavaDocVO;
 import org.genx.javadoc.vo.rest.RestApiDoc;
 import org.genx.javadoc.vo.rest.RestInterfaceDoc;
-import org.genx.javadoc.plugin.springmvc.SpringMVCPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
- * Description: 
+ * Description:
  * @author genx
  * @date 2020/3/1 16:02
  */
@@ -48,13 +47,13 @@ public class RestApiBuilder {
         List<RestInterfaceDoc> list = new ArrayList(1024);
         List<RestInterfaceDoc> temp;
 
-            for (IRestApiPlugin restApiPlugin : restApiPlugins) {
-                temp = restApiPlugin.analysis( javaDocVO);
-                if (temp != null) {
-                    list.addAll(temp);
-                    break;
-                }
+        for (IRestApiPlugin restApiPlugin : restApiPlugins) {
+            temp = restApiPlugin.analysis(javaDocVO);
+            if (temp != null) {
+                list.addAll(temp);
+                break;
             }
+        }
 
         this.restApiDoc.setInterfaces(list);
         return this;

@@ -1,7 +1,5 @@
 package org.genx.javadoc.bean;
 
-import org.genx.javadoc.vo.ClassDocVO;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;

@@ -12,6 +12,8 @@ import java.util.Collection;
  */
 public class DetailedTypeDoc extends TypeDoc {
 
+
+
     /**
      * 大致的类型判断
      * @see org.genx.javadoc.contants.RoughlyType

@@ -1,8 +1,8 @@
 package org.genx.javadoc.test;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 这个类演示了文档注释
@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
  * @author Ayan Amhed
  * @version 1.2
  */
-public class JavaDocTest {
+public class JavaDocTest implements Serializable, Closeable, Comparable<JavaDocTest> {
 
     /**
      * 我是字段 id
@@ -50,6 +50,10 @@ public class JavaDocTest {
         return (new Double(str)).doubleValue();
     }
 
+    public void buildList(List<Map<String, String>> list) {
+
+    }
+
     /**
      * This method demonstrates square().
      * @param args Unused.
@@ -64,5 +68,15 @@ public class JavaDocTest {
         val = ob.getNumber();
         val = ob.square(val);
         System.out.println("Squared value is " + val);
+    }
+
+    @Override
+    public void close() throws IOException {
+
+    }
+
+    @Override
+    public int compareTo(JavaDocTest o) {
+        return 0;
     }
 }

@@ -24,25 +24,20 @@ import java.util.List;
  * @author genx
  * @date 2020/9/5 9:11
  */
-public class JavaDocReaderTest {
+public class JavaDocStockClientTest {
 
     @Test
-    public void test() throws IOException {
-
-        ResourceLoader resourceLoader = new DefaultResourceLoader();
-        Resource resource = resourceLoader.getResource("classpath:/");
-
-        String path = resource.getFile().getAbsolutePath();
+    public void resloveStockClient() throws IOException {
 
         List compilePathList = new ArrayList();
-        compilePathList.add(path + "/../../../javadoc-demo/target/javadoc-demo/WEB-INF/classes");
+        compilePathList.add("E:\\idea-workspace\\CaimaoFinance\\caimao-stock-client\\target\\caimao-stock-client\\WEB-INF\\classes");
 
-        File libDir = new File(path + "/../../../javadoc-demo/target/javadoc-demo/WEB-INF/lib/");
+        File libDir = new File("E:\\idea-workspace\\CaimaoFinance\\caimao-stock-client\\target\\caimao-stock-client\\WEB-INF\\lib");
         for (File file : libDir.listFiles()) {
             compilePathList.add(file.getAbsolutePath());
         }
 
-        File sourceDirectory = new File(path + "/../../../javadoc-demo/src/main/java/");
+        File sourceDirectory = new File("E:\\idea-workspace\\CaimaoFinance\\caimao-stock-client\\src\\main\\java");
 
         JavaDoc javaDoc = JavaDocReader.read(sourceDirectory, compilePathList);
 
@@ -61,26 +56,21 @@ public class JavaDocReaderTest {
 //        System.out.println(JSON.toJSONString(c1));
 
 
-        ClassDoc c2 = javaDoc.getClassDocs().get("org.genx.javadoc.test.JavaDocTest");
-        System.out.println(JSON.toJSONString(c2));
+        try
+        {
+            FileOutputStream fileOut =
+                    new FileOutputStream("D:/work/javadoc/javadoc.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(javaDoc);
+            out.close();
+            fileOut.close();
+            System.out.printf("Serialized data is saved in /tmp/employee.ser");
+        }catch(IOException i)
+        {
+            i.printStackTrace();
+        }
 
-
-        ClassDoc c3 = javaDoc.getClassDocs().get("org.genx.javadoc.entity.UserDetail");
-        System.out.println(JSON.toJSONString(c3));
-
-//        try {
-//            FileOutputStream fileOut =
-//                    new FileOutputStream("D:/work/javadoc/javadoc.ser");
-//            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-//            out.writeObject(javaDoc);
-//            out.close();
-//            fileOut.close();
-//            System.out.printf("Serialized data is saved in /tmp/employee.ser");
-//        } catch (IOException i) {
-//            i.printStackTrace();
-//        }
-//
-//        IOUtils.write(array.toJSONString(), new FileOutputStream("D:/work/javadoc/javadoc.json"), Charsets.UTF_8);
+        IOUtils.write(array.toJSONString(), new FileOutputStream("D:/work/javadoc/javadoc.json"), Charsets.UTF_8);
 
     }
 

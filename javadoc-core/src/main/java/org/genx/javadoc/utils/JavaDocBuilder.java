@@ -59,8 +59,12 @@ public class JavaDocBuilder {
             return classDocMap.containsKey(className);
         }
 
-        public boolean exist(String className) {
-            return classDocs.containsKey(className) || includes.containsKey(className);
+        public ClassDoc get(String className) {
+            ClassDoc classDoc = classDocs.get(className);
+            if (classDoc == null) {
+                classDoc = includes.get(className);
+            }
+            return classDoc;
         }
 
         public void add(ClassDoc classDoc) {

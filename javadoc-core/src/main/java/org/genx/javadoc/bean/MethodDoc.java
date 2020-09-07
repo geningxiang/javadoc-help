@@ -1,6 +1,8 @@
 package org.genx.javadoc.bean;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +13,7 @@ import java.util.Map;
  * @author genx
  * @date 2020/9/4 21:36
  */
-public class MethodDoc implements Serializable {
+public class MethodDoc extends AbsDoc{
 
     /**
      * 方法名
@@ -37,28 +39,6 @@ public class MethodDoc implements Serializable {
     private Map<String, String> throwExpections;
 
 
-    /**
-     * 修饰符数值
-     */
-    private int modifierSpecifier;
-
-    /**
-     * 注解
-     * key 注解的类名
-     */
-    private Map<String, AnnotationDesc> annotations;
-
-    /**
-     * 注释 带换行符的
-     */
-    private CommentDoc comment;
-
-    /**
-     * 注释标签
-     * 例如 @ param
-     */
-    private Map<String, CommentDoc> tags;
-
     public String getMethodName() {
         return methodName;
     }
@@ -73,6 +53,10 @@ public class MethodDoc implements Serializable {
 
     public void setParams(List<TypeDoc> params) {
         this.params = params;
+    }
+
+    public boolean hasNoParam() {
+        return this.params == null || this.params.size() == 0;
     }
 
     public TypeDoc getReturnType() {
@@ -91,35 +75,62 @@ public class MethodDoc implements Serializable {
         this.throwExpections = throwExpections;
     }
 
-    public int getModifierSpecifier() {
-        return modifierSpecifier;
+
+    public CommentDoc getReturnComment() {
+        return getTag("return");
     }
 
-    public void setModifierSpecifier(int modifierSpecifier) {
-        this.modifierSpecifier = modifierSpecifier;
+
+    @Override
+    public String toString() {
+        StringBuilder text = new StringBuilder(256);
+        text.append(this.methodName);
+        text.append("(");
+        if (this.params != null) {
+            for (int i = 0; i < this.params.size(); i++) {
+                if (i > 0) {
+                    text.append(",");
+                }
+                text.append(this.params.get(i).getClassName());
+                //维度  如果是数组的话
+                for (int j = 1; j < this.params.get(i).getDimension(); j++) {
+                    text.append("[]");
+                }
+            }
+        }
+        text.append(")");
+        return text.toString();
     }
 
-    public Map<String, AnnotationDesc> getAnnotations() {
-        return annotations;
+    @Override
+    public AnnotationDesc getAnnotation(String annotationClassName) {
+        if (StringUtils.isNotBlank(annotationClassName) && this.annotations != null) {
+            return this.annotations.get(annotationClassName);
+        }
+        return null;
     }
 
-    public void setAnnotations(Map<String, AnnotationDesc> annotations) {
-        this.annotations = annotations;
+    @Override
+    public boolean hasAnnotation(String annotationClassName) {
+        return StringUtils.isNotBlank(annotationClassName) && annotations != null && annotations.containsKey(annotationClassName);
     }
 
-    public CommentDoc getComment() {
-        return comment;
+    @Override
+    public String getAnnotationValue(String annotationClassName, String key) {
+        if (StringUtils.isNotBlank(annotationClassName) && this.annotations != null) {
+            AnnotationDesc annotationDocVO = this.annotations.get(annotationClassName);
+            return annotationDocVO.getValue(key);
+        }
+        return null;
     }
 
-    public void setComment(CommentDoc comment) {
-        this.comment = comment;
+    @Override
+    public String[] getAnnotationValues(String annotationClassName, String key) {
+        if (StringUtils.isNotBlank(annotationClassName) && this.annotations != null) {
+            AnnotationDesc annotationDocVO = this.annotations.get(annotationClassName);
+            return annotationDocVO.getValues(key);
+        }
+        return null;
     }
 
-    public Map<String, CommentDoc> getTags() {
-        return tags;
-    }
-
-    public void setTags(Map<String, CommentDoc> tags) {
-        this.tags = tags;
-    }
 }

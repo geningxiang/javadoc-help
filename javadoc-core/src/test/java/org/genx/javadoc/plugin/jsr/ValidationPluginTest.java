@@ -1,4 +1,4 @@
-package org.genx.javadoc.plugin.lombok;
+package org.genx.javadoc.plugin.jsr;
 
 import com.alibaba.fastjson.JSON;
 import org.genx.javadoc.JavaDocReaderTest;
@@ -12,18 +12,20 @@ import java.io.IOException;
  * Created with IntelliJ IDEA.
  * Description: 
  * @author genx
- * @date 2020/3/6 22:36
+ * @date 2020/9/6 14:14
  */
-public class LomBokPluginTest {
+public class ValidationPluginTest {
 
     @Test
     public void test() throws IOException {
-
         JavaDoc javaDoc = JavaDocReaderTest.read();
 
         ClassDoc user = javaDoc.getClassDocs().get("org.genx.javadoc.entity.User");
         System.out.println(JSON.toJSONString(user));
 
+
+        ClassDoc userController = javaDoc.getClassDocs().get("org.genx.javadoc.controller.UserController");
+        System.out.println(JSON.toJSONString(userController));
 
     }
 

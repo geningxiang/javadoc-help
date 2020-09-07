@@ -28,7 +28,7 @@ public class AnnotationUtil {
         for (com.sun.javadoc.AnnotationDesc annotation : annotationDescs) {
             AnnotationDesc annotationVO = new AnnotationDesc();
             annotationVO.setName(annotation.annotationType().name());
-//            annotationVO.setText(annotation.toString());
+            annotationVO.setText(annotation.toString());
             annotationVO.setQualifiedName(annotation.annotationType().qualifiedTypeName());
             Map<String, String[]> data = new HashMap<>(8);
             for (com.sun.javadoc.AnnotationDesc.ElementValuePair elementValuePair : annotation.elementValues()) {

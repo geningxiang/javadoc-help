@@ -2,6 +2,11 @@ package org.genx.javadoc.bean;
 
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created with IntelliJ IDEA.
  * Description: 
@@ -28,6 +33,11 @@ public class TypeDoc extends AbsDoc {
      */
     private TypeParameterizedDoc[] parameters;
 
+    /**
+     * 限制
+     * 例如 required notNull email 等 一般是JSR-303 读出来的
+     */
+    private Set<String> limits;
 
     public String getName() {
         return name;
@@ -51,6 +61,25 @@ public class TypeDoc extends AbsDoc {
 
     public void setParameters(TypeParameterizedDoc[] parameters) {
         this.parameters = parameters;
+    }
+
+    public Set<String> getLimits() {
+        return limits;
+    }
+
+    public void setLimits(Set<String> limits) {
+        this.limits = limits;
+    }
+
+    public void addLimit(String limit) {
+        addLimits(Arrays.asList(limit));
+    }
+
+    public void addLimits(Collection<String> limits) {
+        if (this.limits == null) {
+            this.limits = new HashSet();
+        }
+        this.limits.addAll(limits);
     }
 
     /**

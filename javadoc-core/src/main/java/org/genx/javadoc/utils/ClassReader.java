@@ -2,7 +2,6 @@ package org.genx.javadoc.utils;
 
 import com.sun.javadoc.Parameter;
 import com.sun.javadoc.Tag;
-import com.sun.javadoc.Type;
 import org.genx.javadoc.bean.ClassDoc;
 import org.genx.javadoc.bean.MethodDoc;
 import org.genx.javadoc.bean.TypeDoc;
@@ -46,7 +45,7 @@ public class ClassReader {
 
         try {
 
-            tryExtendFromParent( classDocVO, classDoc);
+            tryExtendFromParent(classDocVO, classDoc);
 
             //类的修饰数值
             classDocVO.setModifierSpecifier(classDoc.modifierSpecifier());
@@ -90,8 +89,8 @@ public class ClassReader {
         return classDocVO;
     }
 
-    private void tryExtendFromParent(ClassDoc classDocVO, com.sun.javadoc.ClassDoc classDoc){
-        if(classDoc.superclass() != null && !Object.class.getName().equals(classDoc.superclass().qualifiedTypeName())){
+    private void tryExtendFromParent(ClassDoc classDocVO, com.sun.javadoc.ClassDoc classDoc) {
+        if (classDoc.superclass() != null && !Object.class.getName().equals(classDoc.superclass().qualifiedTypeName())) {
             ClassDoc parentVO = read(classDoc.superclass());
 
             classDocVO.setFields(parentVO.getFields());
@@ -129,26 +128,11 @@ public class ClassReader {
         Map<String, MethodDoc> methods = new TreeMap();
         for (com.sun.javadoc.MethodDoc methodDoc : methodDocs) {
             MethodDoc m = readMethod(methodDoc);
-            methods.put(getMethodQualifiedName(methodDoc), m);
+            methods.put(m.toString(), m);
         }
         return methods;
     }
-    
-    private String getMethodQualifiedName(com.sun.javadoc.MethodDoc methodDoc){
-        StringBuilder name = new StringBuilder(64);
-        name.append(methodDoc.name());
-        name.append("(");
-        if(methodDoc.parameters()!= null){
-            for (int i = 0; i < methodDoc.parameters().length; i++) {
-                if(i > 0){
-                    name.append(",");
-                }
-                name.append(methodDoc.parameters()[i].type().qualifiedTypeName());
-            }
-        }
-        name.append(")");
-        return name.toString();
-    }
+
 
     private MethodDoc readMethod(com.sun.javadoc.MethodDoc methodDoc) {
         MethodDoc methodDocVO = new MethodDoc();
@@ -166,7 +150,6 @@ public class ClassReader {
             paramCommentMap.put(paramTag.parameterName(), paramTag.inlineTags());
         }
         for (Parameter parameter : methodDoc.parameters()) {
-
             params.add(readType(parameter.type(), parameter.name(), paramCommentMap.get(parameter.name()), parameter.annotations(), null, 0));
         }
         methodDocVO.setParams(params);

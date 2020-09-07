@@ -2,6 +2,7 @@ package org.genx.javadoc.utils;
 
 import org.genx.javadoc.bean.ClassDoc;
 import org.genx.javadoc.bean.JavaDoc;
+import org.genx.javadoc.plugin.JavaDocPluginManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,8 @@ public class JavaDocBuilder {
         javaDoc.setClassDocs(env.classDocs);
         javaDoc.setIncludeClassDocs(env.includes);
 
-//        JavaDocPluginManager.handle(javaDocVO);
+        //运行插件
+        JavaDocPluginManager.handle(javaDoc);
 
         return javaDoc;
     }

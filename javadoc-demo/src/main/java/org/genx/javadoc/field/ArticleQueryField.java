@@ -50,9 +50,11 @@ public class ArticleQueryField {
     @Pattern(regexp = "/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,10}$/", message = "密码必须是6~10位数字和字母的组合")
     @Email
     @NotEmpty
-
     @Length(min = 5, max = 10)
     @Range(min = 0, max = 999)
     @URL
     private Integer level;
+
+    private UserLoginField userLoginField;
+
 }

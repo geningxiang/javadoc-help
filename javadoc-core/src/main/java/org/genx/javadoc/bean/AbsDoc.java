@@ -1,5 +1,7 @@
 package org.genx.javadoc.bean;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -90,4 +92,42 @@ public abstract class AbsDoc implements Serializable {
     public void setTags(Map<String, CommentDoc> tags) {
         this.tags = tags;
     }
+
+    public boolean hasAnnotation(String annotationClassName) {
+        return StringUtils.isNotBlank(annotationClassName) && annotations != null && annotations.containsKey(annotationClassName);
+    }
+
+    public AnnotationDesc getAnnotation(String annotationClassName) {
+        if (StringUtils.isNotBlank(annotationClassName) && this.annotations != null) {
+            return this.annotations.get(annotationClassName);
+        }
+        return null;
+    }
+
+    public String getAnnotationValue(String annotationClassName, String key) {
+        if (StringUtils.isNotBlank(annotationClassName) && this.annotations != null) {
+            AnnotationDesc annotationDocVO = this.annotations.get(annotationClassName);
+            return annotationDocVO.getValue(key);
+        }
+        return null;
+    }
+
+    public String[] getAnnotationValues(String annotationClassName, String key) {
+        if (StringUtils.isNotBlank(annotationClassName) && this.annotations != null) {
+            AnnotationDesc annotationDocVO = this.annotations.get(annotationClassName);
+            return annotationDocVO.getValues(key);
+        }
+        return null;
+    }
+
+    public CommentDoc getTag(String tagKey) {
+        if (StringUtils.isBlank(tagKey) || this.tags == null) {
+            return null;
+        }
+        if (tagKey.charAt(0) != '@') {
+            tagKey = "@" + tagKey;
+        }
+        return this.tags.get(tagKey);
+    }
+
 }

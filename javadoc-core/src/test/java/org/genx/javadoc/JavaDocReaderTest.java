@@ -26,25 +26,24 @@ import java.util.List;
  */
 public class JavaDocReaderTest {
 
-    @Test
-    public void test() throws IOException {
-
+    public static JavaDoc read() throws IOException {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
         Resource resource = resourceLoader.getResource("classpath:/");
-
         String path = resource.getFile().getAbsolutePath();
-
         List compilePathList = new ArrayList();
         compilePathList.add(path + "/../../../javadoc-demo/target/javadoc-demo/WEB-INF/classes");
-
         File libDir = new File(path + "/../../../javadoc-demo/target/javadoc-demo/WEB-INF/lib/");
         for (File file : libDir.listFiles()) {
             compilePathList.add(file.getAbsolutePath());
         }
-
         File sourceDirectory = new File(path + "/../../../javadoc-demo/src/main/java/");
+        return  JavaDocReader.read(sourceDirectory, compilePathList);
+    }
 
-        JavaDoc javaDoc = JavaDocReader.read(sourceDirectory, compilePathList);
+
+    @Test
+    public void test() throws IOException {
+        JavaDoc javaDoc = read();
 
 
         JSONArray array = new JSONArray(1024);

@@ -15,7 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -47,6 +48,7 @@ public class UserController {
         responseEntity.setData(new User());
         return responseEntity;
     }
+
 
     /**
      * 用户登录 - 对象接收参数
@@ -110,5 +112,15 @@ public class UserController {
     public ResponseEntity<List<User>> friends(String userToken) {
         return null;
     }
+
+    /**
+     * 根据用户ID 查询
+     * @param userIds
+     */
+    @RequestMapping(value = "/queryByIds", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public ResponseEntity<List<User>> queryByIds(Integer... userIds) {
+        return null;
+    }
+
 }
 

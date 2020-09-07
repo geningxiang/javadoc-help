@@ -69,4 +69,11 @@ public class CommentDoc implements Serializable {
         }
     }
 
+    public static CommentDoc of(String comment){
+        CommentDoc commentDoc = new CommentDoc();
+        commentDoc.setType(TYPE_TEXT);
+        commentDoc.setText(comment);
+        return commentDoc;
+    }
+
 }

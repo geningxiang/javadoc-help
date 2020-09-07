@@ -1,11 +1,11 @@
 package org.genx.javadoc.plugin.lombok;
 
+import org.genx.javadoc.bean.ClassDoc;
+import org.genx.javadoc.bean.JavaDoc;
+import org.genx.javadoc.bean.MethodDoc;
+import org.genx.javadoc.bean.TypeDoc;
 import org.genx.javadoc.plugin.IJavaDocPlugin;
 import org.genx.javadoc.utils.CoreUtil;
-import org.genx.javadoc.vo.ClassDocVO;
-import org.genx.javadoc.vo.JavaDocVO;
-import org.genx.javadoc.vo.MethodDocVO;
-import org.genx.javadoc.vo.TypeDoc;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -30,17 +30,17 @@ public class LomBokPlugin implements IJavaDocPlugin {
     private final String LOMBOK_SETTER = "lombok.Setter";
 
     @Override
-    public void handle(JavaDocVO javaDocVO) {
-        for (ClassDocVO classDoc : javaDocVO.getClassDocs().values()) {
+    public void handle(JavaDoc javaDocVO) {
+        for (ClassDoc classDoc : javaDocVO.getClassDocs().values()) {
             handle(classDoc);
         }
     }
 
-    public void handle(ClassDocVO classDoc) {
+    public void handle(ClassDoc classDoc) {
         boolean addGet = classDoc.hasAnnotation(LOMBOK_DATA) || classDoc.hasAnnotation(LOMBOK_GETTER);
         boolean addSet = classDoc.hasAnnotation(LOMBOK_DATA) || classDoc.hasAnnotation(LOMBOK_SETTER);
 
-        for (TypeDoc field : classDoc.getFields()) {
+        for (TypeDoc field : classDoc.getFields().values()) {
             if (!Modifier.isTransient(field.getModifierSpecifier())
                     && !Modifier.isStatic(field.getModifierSpecifier())) {
                 //非transient && 非static
@@ -62,25 +62,26 @@ public class LomBokPlugin implements IJavaDocPlugin {
 
     }
 
-    private void addGetMethod(ClassDocVO classDoc, TypeDoc field) {
-        MethodDocVO methodDoc = new MethodDocVO();
+    private void addGetMethod(ClassDoc classDoc, TypeDoc field) {
+        MethodDoc methodDoc = new MethodDoc();
         methodDoc.setMethodName("get" + CoreUtil.upperCase(field.getName()));
         methodDoc.setModifierSpecifier(PUBLIC_MODIFIER);
         methodDoc.setParams(null);
         methodDoc.setReturnType(field.copy());
-        classDoc.addMethod(methodDoc);
+        classDoc.putMethod(methodDoc.toString(), methodDoc);
     }
 
-    private void addSetMethod(ClassDocVO classDoc, TypeDoc field) {
+    private void addSetMethod(ClassDoc classDoc, TypeDoc field) {
+        //判断 不是 final 字段
         if (!Modifier.isFinal(field.getModifierSpecifier())) {
-            MethodDocVO methodDoc = new MethodDocVO();
+            MethodDoc methodDoc = new MethodDoc();
             methodDoc.setMethodName("set" + CoreUtil.upperCase(field.getName()));
             methodDoc.setModifierSpecifier(PUBLIC_MODIFIER);
             List<TypeDoc> params = new ArrayList(1);
             params.add(field.copy());
             methodDoc.setParams(params);
             methodDoc.setReturnType(TypeDoc.ofVoid());
-            classDoc.addMethod(methodDoc);
+            classDoc.putMethod(methodDoc.toString(), methodDoc);
         }
     }
 }

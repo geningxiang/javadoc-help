@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.genx.javadoc.bean.JavaDoc;
 import org.genx.javadoc.utils.FileUtil;
 import org.genx.javadoc.utils.JavaDocBuilder;
-import org.genx.javadoc.vo.JavaDocVO;
 
 import java.io.File;
 import java.util.ArrayList;

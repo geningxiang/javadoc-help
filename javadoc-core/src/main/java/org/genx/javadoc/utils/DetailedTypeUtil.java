@@ -1,9 +1,9 @@
 package org.genx.javadoc.utils;
 
-import org.apache.commons.lang3.StringUtils;
-import org.genx.javadoc.bean.TypeParameterizedDoc;
+import org.genx.javadoc.bean.*;
+import org.genx.javadoc.bean.rest.RestNestTypeDoc;
+import org.genx.javadoc.bean.rest.RestTypeDoc;
 import org.genx.javadoc.contants.RoughlyType;
-import org.genx.javadoc.vo.*;
 import org.springframework.beans.BeanUtils;
 
 import java.lang.reflect.Modifier;
@@ -16,71 +16,82 @@ import java.util.*;
  * @date 2020/3/8 14:47
  */
 public class DetailedTypeUtil {
+    private static final String ITERABLE = "java.lang.Iterable";
 
-    private final JavaDocVO env;
 
-    public DetailedTypeUtil(JavaDocVO env) {
+    private final JavaDoc env;
+
+    public DetailedTypeUtil(JavaDoc env) {
         this.env = env;
     }
 
-    public DetailedTypeDoc analysis(TypeDoc typeDoc) {
+    public RestNestTypeDoc analysis(TypeDoc typeDoc) {
 
         //记录已解析的类名  避免死循环嵌套
         Map<String, Integer> resolvedMap = new HashMap(16);
         return analysis(typeDoc, resolvedMap);
     }
 
-    private DetailedTypeDoc analysis(TypeDoc typeDoc, Map<String, Integer> resolvedMap) {
+    private RestNestTypeDoc analysis(TypeDoc typeDoc, Map<String, Integer> resolvedMap) {
 
-        DetailedTypeDoc detailedTypeDoc = DetailedTypeDoc.copyFromTypeDoc(typeDoc);
+        RestNestTypeDoc restTypeDoc = RestNestTypeDoc.copyFromTypeDoc(typeDoc);
 
-        ClassDocVO classDoc = env.getClassDoc(typeDoc.getClassName());
+        ClassDoc classDoc = env.getClassDoc(typeDoc.getClassName());
         if (classDoc != null) {
 
-            detailedTypeDoc.setIterable(classDoc.isIterable());
-            detailedTypeDoc.setType(classDoc.getType());
+            restTypeDoc.setIterable(isIterable(classDoc));
+            RoughlyType roughlyType = CoreUtil.assertType(classDoc);
+
+            restTypeDoc.setType(roughlyType.name());
+
 
             //泛型要对上
-            if (detailedTypeDoc.isIterable()) {
+            if (restTypeDoc.isIterable()) {
                 //可迭代的
-                analysisIterable(detailedTypeDoc, resolvedMap);
-            } else if (RoughlyType.Object.name().equals(classDoc.getType())) {
-                analysisObject(detailedTypeDoc, classDoc, resolvedMap);
+                analysisIterable(restTypeDoc, resolvedMap);
+            } else if (RoughlyType.Object.name().equals(restTypeDoc.getType())) {
+                analysisObject(restTypeDoc, classDoc, resolvedMap);
             }
 
         } else {
             //如果是基础类型
             RoughlyType roughlyType = RoughlyType.assertBaseType(typeDoc.getClassName());
             if (roughlyType != null) {
-                detailedTypeDoc.setType(roughlyType.name());
+                restTypeDoc.setType(roughlyType.name());
             }
         }
-        return detailedTypeDoc;
+        return restTypeDoc;
     }
 
-    private void analysisIterable(DetailedTypeDoc detailedTypeDoc, Map<String, Integer> resolvedMap) {
-        if (detailedTypeDoc.getParameteres() != null && detailedTypeDoc.getParameteres().length > 0) {
-            TypeParameterizedDoc itemParameterizedDoc = detailedTypeDoc.getParameteres()[0];
+    private boolean isIterable(ClassDoc classDoc){
+        return classDoc.getInterfaceTypes().contains(ITERABLE);
+    }
 
-            DetailedTypeDoc item = new DetailedTypeDoc();
+    private void analysisIterable(RestNestTypeDoc restTypeDoc, Map<String, Integer> resolvedMap) {
+        if (restTypeDoc.getParameters() != null && restTypeDoc.getParameters().length > 0) {
+            TypeParameterizedDoc itemParameterizedDoc = restTypeDoc.getParameters()[0];
+
+            RestNestTypeDoc item = new RestNestTypeDoc();
 
             item.setName("_item");
             item.setClassInfo(itemParameterizedDoc.getText());
             item.setClassName(itemParameterizedDoc.getClassName());
             item.setDimension(itemParameterizedDoc.getDimension());
-            item.setParameteres(itemParameterizedDoc.getParameters());
-            ClassDocVO itemClassDoc = env.getClassDoc(itemParameterizedDoc.getClassName());
-            if (itemClassDoc != null && RoughlyType.Object.name().equals(itemClassDoc.getType())) {
+            item.setParameters(itemParameterizedDoc.getParameters());
+            ClassDoc itemClassDoc = env.getClassDoc(itemParameterizedDoc.getClassName());
+            RoughlyType roughlyType =  CoreUtil.assertType(itemClassDoc);
+            if (itemClassDoc != null && RoughlyType.Object == roughlyType) {
                 analysisObject(item, itemClassDoc, resolvedMap);
             }
 
-            detailedTypeDoc.setData(Arrays.asList(item));
+            restTypeDoc.setData(Arrays.asList(item));
         }
     }
 
     //解析 Object 类型
-    private void analysisObject(DetailedTypeDoc detailedTypeDoc, ClassDocVO classDoc, Map<String, Integer> resolvedMap) {
-        detailedTypeDoc.setType(classDoc.getType());
+    private void analysisObject(RestNestTypeDoc restTypeDoc, ClassDoc classDoc, Map<String, Integer> resolvedMap) {
+        RoughlyType roughlyType =  CoreUtil.assertType(classDoc);
+        restTypeDoc.setType(roughlyType.name());
         if (resolvedMap.containsKey(classDoc.getClassName()) || classDoc.getClassName().startsWith("java.")) {
             // java. 开头的包名 不解析
             return;
@@ -89,22 +100,22 @@ public class DetailedTypeUtil {
         resolvedMap.put(classDoc.getClassName(), 1);
 
         Map<String, TypeParameterizedDoc> typeParameterizedDocMap = new HashMap(8);
-        if (classDoc.getTypeParameters() != null && detailedTypeDoc.getParameteres() != null) {
-            for (int i = 0; i < classDoc.getTypeParameters().size() && i < detailedTypeDoc.getParameteres().length; i++) {
-                typeParameterizedDocMap.put(classDoc.getTypeParameters().get(i).getName(), detailedTypeDoc.getParameteres()[i]);
+        if (classDoc.getTypeParameters() != null && restTypeDoc.getParameters() != null) {
+            for (int i = 0; i < classDoc.getTypeParameters().size() && i < restTypeDoc.getParameters().length; i++) {
+                typeParameterizedDocMap.put(classDoc.getTypeParameters().get(i).getName(), restTypeDoc.getParameters()[i]);
             }
         }
 
         Map<String, TypeDoc> fieldMap = new HashMap(16);
-        for (TypeDoc field : classDoc.getFields()) {
+        for (TypeDoc field : classDoc.getFields().values()) {
             fieldMap.put(field.getName(), field);
         }
 
 
-        List<DetailedTypeDoc> list = new ArrayList(classDoc.getMethods().size());
+        List<RestTypeDoc> list = new ArrayList(classDoc.getMethods().size());
 
         TypeDoc field;
-        for (MethodDocVO method : classDoc.getMethods()) {
+        for (MethodDoc method : classDoc.getMethods().values()) {
 
             if (Modifier.isPublic(method.getModifierSpecifier())
                     && !Modifier.isStatic(method.getModifierSpecifier())
@@ -132,13 +143,13 @@ public class DetailedTypeUtil {
             }
         }
         if (list.size() > 0) {
-            detailedTypeDoc.setData(list);
+            restTypeDoc.setData(list);
         }
     }
 
 
     private void mergeFieldInfoToMethod(TypeDoc field, TypeDoc methodReturnType) {
-        if (StringUtils.isBlank(methodReturnType.getComment())) {
+        if (methodReturnType.getComment() == null) {
             methodReturnType.setComment(field.getComment());
         }
         if (field.getLimits() != null && field.getLimits().size() > 0) {
@@ -157,10 +168,10 @@ public class DetailedTypeUtil {
         if (typeParameterizedDoc != null) {
             typeDoc.setClassName(typeParameterizedDoc.getClassName());
             typeDoc.setClassInfo(typeParameterizedDoc.getText());
-            typeDoc.setParameteres(typeParameterizedDoc.getParameters());
+            typeDoc.setParameters(typeParameterizedDoc.getParameters());
             typeDoc.setDimension(typeParameterizedDoc.getDimension());
-        } else if (typeDoc.getParameteres() != null && typeDoc.getParameteres().length > 0) {
-            matchTypeParameter(typeDoc.getParameteres(), typeParameterizedDocMap);
+        } else if (typeDoc.getParameters() != null && typeDoc.getParameters().length > 0) {
+            matchTypeParameter(typeDoc.getParameters(), typeParameterizedDocMap);
         }
     }
 

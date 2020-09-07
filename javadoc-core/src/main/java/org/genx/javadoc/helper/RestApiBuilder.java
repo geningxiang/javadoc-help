@@ -1,13 +1,15 @@
 package org.genx.javadoc.helper;
 
+import org.genx.javadoc.bean.JavaDoc;
+import org.genx.javadoc.bean.rest.RestApiDoc;
+import org.genx.javadoc.bean.rest.RestInterfaceDoc;
 import org.genx.javadoc.plugin.IRestApiPlugin;
 import org.genx.javadoc.plugin.springmvc.SpringMVCPlugin;
-import org.genx.javadoc.vo.JavaDocVO;
-import org.genx.javadoc.vo.rest.RestApiDoc;
-import org.genx.javadoc.vo.rest.RestInterfaceDoc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -43,19 +45,21 @@ public class RestApiBuilder {
         return this;
     }
 
-    public RestApiBuilder analysisClassDocs(JavaDocVO javaDocVO) {
-        List<RestInterfaceDoc> list = new ArrayList(1024);
+    public RestApiBuilder analysisClassDocs(JavaDoc javaDocVO) {
+        Map<String, RestInterfaceDoc> restInterfaceDocMap = new TreeMap();
         List<RestInterfaceDoc> temp;
 
         for (IRestApiPlugin restApiPlugin : restApiPlugins) {
             temp = restApiPlugin.analysis(javaDocVO);
             if (temp != null) {
-                list.addAll(temp);
+                for (RestInterfaceDoc restInterfaceDoc : temp) {
+                    restInterfaceDocMap.put(restInterfaceDoc.toString(), restInterfaceDoc);
+                }
                 break;
             }
         }
 
-        this.restApiDoc.setInterfaces(list);
+        this.restApiDoc.setInterfaces(restInterfaceDocMap);
         return this;
     }
 

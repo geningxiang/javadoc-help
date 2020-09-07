@@ -15,7 +15,7 @@ public class JavaDoc implements Serializable {
     /**
      * .java对应的类
      */
-    private transient Map<String, ClassDoc> classDocs = new HashMap(2048);
+    private Map<String, ClassDoc> classDocs = new HashMap(2048);
 
     /**
      * 其他引用类
@@ -26,6 +26,15 @@ public class JavaDoc implements Serializable {
     public Map<String, ClassDoc> getClassDocs() {
         return classDocs;
     }
+
+    public ClassDoc getClassDoc(String className){
+        ClassDoc doc = this.classDocs.get(className);
+        if(doc == null){
+            doc = this.includeClassDocs.get(className);
+        }
+        return doc;
+    }
+
 
     public void setClassDocs(Map<String, ClassDoc> classDocs) {
         this.classDocs = classDocs;

@@ -1,7 +1,7 @@
 package org.genx.javadoc.plugin;
 
-import org.genx.javadoc.vo.JavaDocVO;
-import org.genx.javadoc.vo.rest.RestInterfaceDoc;
+import org.genx.javadoc.bean.JavaDoc;
+import org.genx.javadoc.bean.rest.RestInterfaceDoc;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public interface IRestApiPlugin {
      * @param javaDocVO
      * @return if null 尝试下一个插件
      */
-    default List<RestInterfaceDoc> analysis(JavaDocVO javaDocVO) {
+    default List<RestInterfaceDoc> analysis(JavaDoc javaDocVO) {
         return null;
     }
 

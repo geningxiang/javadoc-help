@@ -98,7 +98,9 @@ public class DetailedTypeUtil {
         for (TypeDoc field : classDoc.getFields()) {
             fieldMap.put(field.getName(), field);
         }
-
+        if(classDoc.getMethods() == null){
+            return;
+        }
 
         List<DetailedTypeDoc> list = new ArrayList(classDoc.getMethods().size());
 

@@ -76,64 +76,6 @@
 
     <build>
         <plugins>
-            <!--生成Source jar文件-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!--生成Javadoc，关闭doclint,避免注解检查不通过-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <additionalparam>-Xdoclint:none</additionalparam>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!--Maven GPG插件用于使用以下配置对组件进行签名-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!--Nexus Staging Maven插件是将组件部署到OSSRH并将其发布到Central Repository的推荐方法-->
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>sonatype_snapshots</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
 
         </plugins>
     </build>
@@ -144,43 +86,6 @@
             <email>geningxiang@qq.com</email>
         </developer>
     </developers>
-
-    <scm>
-        <connection>scm:git:https://github.com/geningxiang/javadoc-help</connection>
-        <developerConnection>scm:git:git@github.com/geningxiang/javadoc-help.git</developerConnection>
-        <url>https://github.com/geningxiang/javadoc-help</url>
-        <tag>HEAD</tag>
-    </scm>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-            <comments>A business-friendly OSS license</comments>
-        </license>
-    </licenses>
-
-
-    <!-- 发布管理信息 -->
-    <distributionManagement>
-        <repository>
-            <!-- 这里的id必须要和全局配置中的release id 一致 -->
-            <id>sonatype_releases</id>
-            <name>Nexus Release Repository</name>
-            <!-- 这里就是在创建issue成功后，对方回复的release发布地址-->
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository>
-        <snapshotRepository>
-            <!-- 这里的id必须要和全局配置中的snapshot id 一致 -->
-            <id>sonatype_snapshots</id>
-            <name>Nexus Snapshot Repository</name>
-            <!-- 这里就是在创建issue成功后，对方回复的snapshot发布地址-->
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
-
     <!-- deploy到私有仓库 -->
 <!--    <distributionManagement>-->
 <!--        <repository>-->

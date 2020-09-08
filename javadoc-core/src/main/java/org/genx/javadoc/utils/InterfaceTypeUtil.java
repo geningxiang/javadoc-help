@@ -2,7 +2,8 @@ package org.genx.javadoc.utils;
 
 import com.sun.javadoc.ClassDoc;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,27 +20,26 @@ public class InterfaceTypeUtil {
      */
     public static Set<String> readInterfaceTypes(ClassDoc classDoc) {
         Set<String> interfaceTypes = new HashSet(16);
-        readInterfaceTypes(interfaceTypes, classDoc);
+        Set<String> processed = new HashSet(16);
+        processed.add(Object.class.getName());
+        readInterfaceTypes(interfaceTypes, classDoc, processed);
         return interfaceTypes;
     }
 
-    private static void readInterfaceTypes(Set<String> interfaceTypes, ClassDoc classDoc) {
-        if (Object.class.getName().equals(classDoc.qualifiedTypeName())) {
+    private static void readInterfaceTypes(Set<String> interfaceTypes, ClassDoc classDoc, Set<String> processed) {
+        if (classDoc == null || processed.contains(classDoc.qualifiedTypeName())) {
             return;
         }
-        List<ClassDoc> list = Arrays.asList(classDoc.interfaces());
-        List<ClassDoc> nextList;
-        while (!list.isEmpty()) {
-            nextList = new LinkedList();
-            for (ClassDoc type : list) {
-                if (interfaceTypes.add(type.qualifiedTypeName())) {
-                    nextList.add(type);
-                }
-            }
-            list = nextList;
+        processed.add(classDoc.qualifiedTypeName());
+
+        for (ClassDoc type : classDoc.interfaces()) {
+            interfaceTypes.add(type.qualifiedTypeName());
+            //type  接口也可能有父类
+            readInterfaceTypes(interfaceTypes, type, processed);
         }
+
         if (classDoc.superclass() != null) {
-            readInterfaceTypes(interfaceTypes, classDoc.superclass());
+            readInterfaceTypes(interfaceTypes, classDoc.superclass(), processed);
         }
     }
 

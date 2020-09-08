@@ -4,14 +4,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.genx.javadoc.bean.*;
 import org.genx.javadoc.bean.rest.RestInterfaceDoc;
 import org.genx.javadoc.bean.rest.RestNestTypeDoc;
-import org.genx.javadoc.bean.rest.RestTypeDoc;
 import org.genx.javadoc.plugin.IRestApiPlugin;
 import org.genx.javadoc.utils.DetailedTypeUtil;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,11 +25,24 @@ public class SpringMVCPlugin implements IRestApiPlugin {
 
     private static final String REQUEST_MAPPING = "org.springframework.web.bind.annotation.RequestMapping";
 
+    private static final String PATH_VARIABLE = "org.springframework.web.bind.annotation.PathVariable";
+
     private static final String REQUEST_HEADER = "org.springframework.web.bind.annotation.RequestHeader";
 
     private static final String REQUEST_BODY = "org.springframework.web.bind.annotation.RequestBody";
 
     private static final String REQUEST_PARAM = "org.springframework.web.bind.annotation.RequestParam";
+
+    private static Map<String, String> METHOD_MAP = new HashMap(8);
+
+    static {
+        METHOD_MAP.put(REQUEST_MAPPING, null);
+        METHOD_MAP.put("org.springframework.web.bind.annotation.GetMapping", "GET");
+        METHOD_MAP.put("org.springframework.web.bind.annotation.PostMapping", "POST");
+        METHOD_MAP.put("org.springframework.web.bind.annotation.PutMapping", "PUT");
+        METHOD_MAP.put("org.springframework.web.bind.annotation.DeleteMapping", "DELETE");
+        METHOD_MAP.put("org.springframework.web.bind.annotation.PatchMapping", "PATCH");
+    }
 
     @Override
     public List<RestInterfaceDoc> analysis(JavaDoc javaDoc) {
@@ -83,15 +92,8 @@ public class SpringMVCPlugin implements IRestApiPlugin {
     private boolean isRequestMapping(ClassDoc classDoc, MethodDoc methodDoc) {
         if (classDoc.hasAnnotation(REST_CONTROLLER)
                 || (classDoc.hasAnnotation(CONTROLLER) && methodDoc.hasAnnotation(RESPONSE_BODY))) {
-            LinkedHashMap<String, String> map = new LinkedHashMap(8);
-            map.put(REQUEST_MAPPING, null);
-            map.put("org.springframework.web.bind.annotation.GetMapping", "GET");
-            map.put("org.springframework.web.bind.annotation.PostMapping", "POST");
-            map.put("org.springframework.web.bind.annotation.PutMapping", "PUT");
-            map.put("org.springframework.web.bind.annotation.DeleteMapping", "DELETE");
-            map.put("org.springframework.web.bind.annotation.PatchMapping", "PATCH");
             AnnotationDesc result;
-            for (Map.Entry<String, String> entry : map.entrySet()) {
+            for (Map.Entry<String, String> entry : METHOD_MAP.entrySet()) {
                 result = methodDoc.getAnnotation(entry.getKey());
                 if (result != null) {
                     if (StringUtils.isNotBlank(entry.getValue())) {
@@ -141,7 +143,9 @@ public class SpringMVCPlugin implements IRestApiPlugin {
 
                 RestNestTypeDoc restTypeDoc = detailedTypeUtil.analysis(param);
 
-                if (param.hasAnnotation(REQUEST_HEADER)) {
+                if (param.hasAnnotation(PATH_VARIABLE)) {
+                    doc.addPathVariable(restTypeDoc.getName(), restTypeDoc);
+                } else if (param.hasAnnotation(REQUEST_HEADER)) {
                     doc.addHeader(restTypeDoc.getName(), restTypeDoc);
                 } else if (param.hasAnnotation(REQUEST_BODY)) {
                     doc.addBody(restTypeDoc.getName(), restTypeDoc);
@@ -173,6 +177,7 @@ public class SpringMVCPlugin implements IRestApiPlugin {
 
     public String[] readMethods(MethodDoc methodDocVO) {
         AnnotationDesc annotationVO = methodDocVO.getAnnotation(REQUEST_MAPPING);
+        Set<String> methods = new HashSet();
         if (annotationVO != null) {
             String[] values = annotationVO.getValues("method");
             if (values != null) {
@@ -180,13 +185,17 @@ public class SpringMVCPlugin implements IRestApiPlugin {
                 for (int i = 0; i < values.length; i++) {
                     //org.springframework.web.bind.annotation.RequestMethod.GET 去掉前缀
                     if ((index = values[i].lastIndexOf(".")) > -1) {
-                        values[i] = values[i].substring(index + 1);
+                        methods.add(values[i].substring(index + 1));
                     }
                 }
-                return values;
             }
         }
-        return null;
+        for (Map.Entry<String, String> entry : METHOD_MAP.entrySet()) {
+            if (StringUtils.isNotBlank(entry.getValue()) && methodDocVO.hasAnnotation(entry.getKey())) {
+                methods.add(entry.getValue());
+            }
+        }
+        return methods.toArray(new String[0]);
     }
 
     public String readProduces(MethodDoc methodDocVO) {

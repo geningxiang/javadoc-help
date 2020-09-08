@@ -2,6 +2,7 @@ package org.genx.javadoc.bean.rest;
 
 import org.genx.javadoc.bean.CommentDoc;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -30,6 +31,7 @@ public class RestInterfaceDoc {
 
     /**
      * 返回的数据类型
+     * 例如 application/json  charset=UTF-8
      */
     private String produces;
 
@@ -45,12 +47,26 @@ public class RestInterfaceDoc {
      */
     private CommentDoc description;
 
+    /**
+     * 请求地址上的参数
+     * 例如 @PathVariable("id")
+     */
+    private Map<String, RestTypeDoc> pathVariables = new LinkedHashMap();
 
+    /**
+     * header参数
+     */
     private Map<String, RestTypeDoc> headers = new TreeMap();
 
+    /**
+     * param参数
+     */
     private Map<String, RestTypeDoc> params = new TreeMap();
 
-    private Map<String, RestNestTypeDoc> body = new TreeMap();
+    /**
+     * body参数
+     */
+    private Map<String, RestNestTypeDoc> bodys = new TreeMap();
 
     /**
      * 返回的
@@ -110,6 +126,18 @@ public class RestInterfaceDoc {
         this.description = description;
     }
 
+    public Map<String, RestTypeDoc> getPathVariables() {
+        return pathVariables;
+    }
+
+    public void setPathVariables(Map<String, RestTypeDoc> pathVariables) {
+        this.pathVariables = pathVariables;
+    }
+
+    public void addPathVariable(String key, RestTypeDoc pathVariable) {
+        this.pathVariables.put(key, pathVariable);
+    }
+
     public Map<String, RestTypeDoc> getHeaders() {
         return headers;
     }
@@ -139,18 +167,18 @@ public class RestInterfaceDoc {
         this.params.put(key, param);
     }
 
-    public Map<String, RestNestTypeDoc> getBody() {
-        return body;
+    public Map<String, RestNestTypeDoc> getBodys() {
+        return bodys;
     }
 
-    public void setBody(Map<String, RestNestTypeDoc> body) {
-        if (body != null) {
-            this.body.putAll(body);
+    public void setBodys(Map<String, RestNestTypeDoc> bodys) {
+        if (bodys != null) {
+            this.bodys.putAll(bodys);
         }
     }
 
     public void addBody(String key, RestNestTypeDoc body) {
-        this.body.put(key, body);
+        this.bodys.put(key, body);
     }
 
     public RestNestTypeDoc getReturnBody() {

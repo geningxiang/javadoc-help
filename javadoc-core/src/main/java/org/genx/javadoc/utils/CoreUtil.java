@@ -75,7 +75,9 @@ public class CoreUtil {
 
     public static boolean isDate(ClassDoc classDoc) {
         if (classDoc != null) {
-            return classDoc.getInterfaceTypes().contains(DATE);
+            //TODO 要不要在 classDoc上加上父类 信息
+            //Date不是接口  也没有标记父类， 只好先判断一下方法
+            return classDoc.getMethods().containsKey("before(java.util.Date)") && classDoc.getMethods().containsKey("after(java.util.Date)");
         }
         return false;
     }

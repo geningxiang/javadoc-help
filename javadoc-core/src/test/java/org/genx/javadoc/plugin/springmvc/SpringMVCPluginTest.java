@@ -29,11 +29,16 @@ public class SpringMVCPluginTest {
 
         System.out.println("== 接口列表 ==");
 
+        System.out.println(JSON.toJSONString(restApiDoc));
+
+
         Map<String, RestInterfaceDoc> map = restApiDoc.getInterfaces();
 
 
+        System.out.println(JSON.toJSONString(map));
 
-        System.out.println(JSON.toJSONString(map.get("/api/v1/app/home@GET")));
+
+        System.out.println(JSON.toJSONString(map.get("/api/article/query")));
 
     }
 }

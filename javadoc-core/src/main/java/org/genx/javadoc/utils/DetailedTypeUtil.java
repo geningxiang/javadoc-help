@@ -44,7 +44,6 @@ public class DetailedTypeUtil {
 
             restTypeDoc.setType(roughlyType.name());
 
-
             //泛型要对上
             if (restTypeDoc.isIterable()) {
                 //可迭代的

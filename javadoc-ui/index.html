@@ -21,6 +21,38 @@
     </ul>
 </article>
 
+<script id="paramsTemplate" type="text/html">
+    {{if paramList && paramList.length > 0}}
+    <h2>{{name}}</h2>
+    <table class="typeTable">
+        <tr>
+            <th>参数名</th>
+            <th>类型</th>
+            <th>描述</th>
+            <th>限制</th>
+        </tr>
+        {{each paramList item j}}
+        <tr data-depth="{{item.depth}}">
+            <td class="name" style="{{'padding-left:'+(item.depth * 12 + 10)+'px;'}}">
+                {{if item.depth > 0}}
+                <div class="depth" style="{{'width:' + (item.depth * 12) + 'px;'}}"></div>
+                {{/if}}
+                {{item.name}}
+            </td>
+            <td class="classType" title="{{item.classInfo}}">{{item.type}}
+                <i></i>
+            </td>
+            <td>{{@ CommentUtil.parse(item.comment)}}</td>
+            <td>
+                {{each item.limits limit}}
+                <p>{{limit}}</p>
+                {{/each}}
+            </td>
+        </tr>
+        {{/each}}
+    </table>
+    {{/if}}
+</script>
 <script id="apiTemplate" type="text/html">
     {{each $data item i}}
     <li data-path="{{item.url}}">
@@ -35,40 +67,13 @@
             <span>{{method}}</span>
             {{/each}}
         </div>
-        <pre><code>{{@ item.description || '暂无'}}</code></pre>
-        <h2>请求参数</h2>
-        <table class="typeTable">
-            <tr>
-                <th>参数名</th>
-                <th>类型</th>
-                <th>描述</th>
-                <th>限制</th>
-            </tr>
-            {{if !item.params || item.params.length == 0}}
-            <tr>
-                <td colspan="4" style="text-align: center">无请求参数</td>
-            </tr>
-            {{/if}}
-            {{each item.paramList item j}}
-            <tr data-depth="{{item.depth}}">
-                <td class="name" style="{{'padding-left:'+(item.depth * 12 + 10)+'px;'}}">
-                    {{if item.depth > 0}}
-                    <div class="depth" style="{{'width:' + (item.depth * 12) + 'px;'}}"></div>
-                    {{/if}}
-                    {{item.name}}
-                </td>
-                <td class="classType" title="{{item.classInfo}}">{{item.type}}
-                <i></i>
-                </td>
-                <td>{{item.comment}}</td>
-                <td>
-                    {{each item.limits limit}}
-                    <p>{{limit}}</p>
-                    {{/each}}
-                </td>
-            </tr>
-            {{/each}}
-        </table>
+        <pre><code>{{@ CommentUtil.parse(item.description) || '暂无'}}</code></pre>
+
+        <% include('paramsTemplate', {paramList: item.pathVariableList, name: 'PATH_VARIABLES' }) %>
+        <% include('paramsTemplate', {paramList: item.headerList, name: 'HEADERS' }) %>
+        <% include('paramsTemplate', {paramList: item.paramList, name: 'PARAMS' }) %>
+        <% include('paramsTemplate', {paramList: item.bodyList, name: 'BODYS' }) %>
+
         <h2>响应内容</h2>
         <table class="typeTable">
             <tr>
@@ -86,8 +91,8 @@
                     {{item.name}}
                 </td>
                 <td class="classType" title="{{item.classInfo}}">{{item.type}}
-                <i></i></td>
-                <td>{{item.comment}}</td>
+                    <i></i></td>
+                <td>{{@ CommentUtil.parse(item.comment)}}</td>
                 <td>
                     {{each item.limits limit}}
                     <p>{{limit}}</p>
@@ -99,7 +104,7 @@
         </table>
         {{if item.returnComment}}
         <h2>响应描述</h2>
-        <pre><code>{{@ item.returnComment || '暂无'}}</code></pre>
+        <pre><code>{{@ CommentUtil.parse(item.returnComment) || '暂无'}}</code></pre>
         {{/if}}
     </li>
     {{/each}}
@@ -114,9 +119,8 @@
     $body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body');
 
     const TreeUtil = function () {
-
         const parseTreeToList = function (treeObj, list, depth) {
-            if(!treeObj) {
+            if (!treeObj) {
                 return;
             }
             let data = Object.assign({}, treeObj);
@@ -137,8 +141,6 @@
                 }
             }
         };
-
-
         return {
             parseTreeToList: function (treeObj) {
                 let list = [];
@@ -154,48 +156,81 @@
         }
     }();
 
+    const CommentUtil = function () {
+        return {
+            parse: function (comment) {
+                if (!comment) return '';
+                let html = '';
+                if (comment.type != 'Text') {
+                    if(comment.type == '@link' || comment.type == '@linkPlan'){
+                       html+= '<a href="javascript: alert(\'该功能将在下一版本到来！\')">';
+                    }
+                    html += '{' + comment.type + ' ';
+                }
+                if (comment.text) {
+                    html += comment.text;
+                } else if (comment.inlines && comment.inlines.length > 0) {
+                    comment.inlines.forEach((item) => {
+                        html += this.parse(item);
+                    });
+                }
+                if (comment.type != 'Text') {
+                    html += '}';
+                    if(comment.type == '@link' || comment.type == '@linkPlan'){
+                        html+= '</a>';
+                    }
+                }
+                return html;
+            }
+        }
+    }();
 
-    restApiData.interfaces.forEach(function (interfaceItem) {
-        interfaceItem.paramList = TreeUtil.parseTreeToList(interfaceItem.params);
+    template.defaults.imports.CommentUtil = CommentUtil;
+
+    const interfaces = Object.values(restApiData.interfaces);
+    interfaces.forEach(function (interfaceItem) {
+        interfaceItem.pathVariableList = TreeUtil.parseTreeToList(Object.values(interfaceItem.pathVariables));
+        interfaceItem.headerList = TreeUtil.parseTreeToList(Object.values(interfaceItem.headers));
+        interfaceItem.paramList = TreeUtil.parseTreeToList(Object.values(interfaceItem.params));
+        interfaceItem.bodyList = TreeUtil.parseTreeToList(Object.values(interfaceItem.bodys));
+
         interfaceItem.returnList = TreeUtil.parseTreeToList(interfaceItem.returnBody);
     });
 
-    console.log('restApiData', restApiData);
+    console.log('接口信息', restApiData);
 
     $("#apiContent").html(template("apiTemplate", restApiData.interfaces));
 
     //尝试定位锚点
-    setTimeout(function(){
-        if(window.location.hash) {
+    setTimeout(function () {
+        if (window.location.hash) {
             console.log('window.location.hash', window.location.hash);
             var apiLis = $('#apiContent li[data-path^="' + window.location.hash.substring(1) + '"]');
             console.log(apiLis);
-            if(apiLis.length > 0) {
+            if (apiLis.length > 0) {
                 $body.animate({scrollTop: $(apiLis[0]).offset().top}, 300);
             }
         }
     }, 10);
 
 
-
-    var parseTree = function(apiArray, depth){
+    var parseTree = function (apiArray, depth) {
         depth = depth || 3; //默认遍历到3层
         var treeMap = {};
         for (var i = 0; i < apiArray.length; i++) {
             var item = apiArray[i];
             var ss = item.url.split('/');
-
+    console.log('ss', ss);
             var data = treeMap;
             var currentDepth = 0;
             for (var j = 0; j < ss.length; j++) {
-                if(ss[j]){
+                if (ss[j]) {
                     currentDepth++;
-
-                    if(j == ss.length - 1 || currentDepth >= depth){
+                    if (j == ss.length - 1 || currentDepth >= depth) {
                         data[ss.slice(j).join("/")] = null;
                         break;
                     } else {
-                        if(!data[ss[j]]) {
+                        if (!data[ss[j]]) {
                             data[ss[j]] = {};
                         }
                         data = data[ss[j]];
@@ -208,9 +243,9 @@
     };
 
 
-    var apiTree = parseTree(restApiData.interfaces, 4);
+    var apiTree = parseTree(interfaces, 4);
 
-    console.log('pathTree', apiTree);
+    console.log('侧边树形层级', apiTree);
 
     var parseArray = function (treeMap, basePath) {
         var data = [];
@@ -233,7 +268,7 @@
 
     treeEl.on('nodeSelected', function (e, item) {
         var apiLis = $('#apiContent li[data-path^="' + item.path + '"]');
-        if(apiLis.length > 0) {
+        if (apiLis.length > 0) {
             $body.animate({scrollTop: $(apiLis[0]).offset().top}, 300);
         }
     });

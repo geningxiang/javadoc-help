@@ -31,8 +31,8 @@ public class UserController {
 
     /**
      * 用户登录
-     * @param userName 用户名
-     * @param passWord 密码
+     * @param userName 用户名 {@link User#getUserName()}
+     * @param passWord 密码 {@link User#getPassWord()}
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public ResponseEntity<User> login(
@@ -42,11 +42,7 @@ public class UserController {
             @NotBlank
             @Pattern(regexp = "/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,10}$/", message = "密码必须是6~10位数字和字母的组合")
                     String passWord) {
-
-        ResponseEntity responseEntity = new ResponseEntity<User>();
-        responseEntity.setCode(200);
-        responseEntity.setData(new User());
-        return responseEntity;
+        return null;
     }
 
 

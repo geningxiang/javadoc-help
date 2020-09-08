@@ -79,12 +79,14 @@ th {
     padding: 5px;
     border: #e0e0e0 1px solid;
     text-align: center;
+    background-clip:padding-box;
 }
 
 td {
     position: relative;
     padding: 5px;
     border: #e0e0e0 1px solid;
+    background-clip:padding-box;
 }
 
 .typeTable .name .depth{
@@ -147,6 +149,11 @@ table .classType i{
     background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACAklEQVRYR82XPS8lURjHf+ILbEJDlqDQ2YYPYAsK8Vag22Q3EkuyiuVr4BYKIRFCh8LbKlbBB6Ch24LNWjQkegX538zIuXNn3POMScaT3OJmnpffPHPOef6nCpvVAQNAK1AL1ATh98Ad8AfYAW5901Z5Oo4BvUCfp/8esA8sVfKvBKDC+rVXSpTw/DSASAR5DWADGE5ZOBq2CYzE5UoCuAI+ZlQ8TPMfaIjmjAM4A9o8i18Dj0CTp/858Mn1jQLMAlOeyb4Bq4HvNDDjGTcHyL9oLoAW26Jnkr9As+OrDlx6xsrte7hDXIATw2o/Bj5HCj4ZALQ7OtwOWN5ecW8FeOlC2IHfQJfhDbIAOAS6BaCt8c9QPKsOKE+jAH4A8zkBTApA2+JnTgAFAawBX3ICWBfAL6AnJ4CDdwGQ+ydIswj1xXQS6jyQaWxrfFutuAjHgQVrJPAQAFQHR3h9ihwTApDOu0kRnEVIfXgU7xr0nlt4O/gzmIJGurE/BLAOI9XTNNNUk0kzapparDiS045jCREJEtdWgK+eBGXjWHGWLsRNwyOg0xMgVpAo1qKENT+Wg4KjQMGzeIlCjhOlFkWsrSj74Fm8TBknyXKLMvasTZkiVuBrFxOLQq4EUaKEXed3fTVzQbVDhgy6UXpvK4vLabS10o+6nrckXM8vguu5FrKXPQOvSGz1rUc1nQAAAABJRU5ErkJggg==')
     center / contain no-repeat;
 
+}
+
+table a{
+    color: initial;
+    text-decoration: underline;
 }
 
 pre {

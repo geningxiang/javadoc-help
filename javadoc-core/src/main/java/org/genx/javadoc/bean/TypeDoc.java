@@ -1,4 +1,4 @@
-package org.genx.javadoc.vo;
+package org.genx.javadoc.bean;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -14,7 +14,7 @@ import java.util.Set;
  * @date 2020/2/23 16:44
  */
 
-public class TypeDoc extends AbsDocVO {
+public class TypeDoc extends AbsDoc {
 
 
     /**
@@ -31,7 +31,7 @@ public class TypeDoc extends AbsDocVO {
     /**
      * 指定的泛型
      */
-    private TypeParameterizedDoc[] parameteres;
+    private TypeParameterizedDoc[] parameters;
 
     /**
      * 限制
@@ -55,12 +55,12 @@ public class TypeDoc extends AbsDocVO {
         this.dimension = dimension;
     }
 
-    public TypeParameterizedDoc[] getParameteres() {
-        return parameteres;
+    public TypeParameterizedDoc[] getParameters() {
+        return parameters;
     }
 
-    public void setParameteres(TypeParameterizedDoc[] parameteres) {
-        this.parameteres = parameteres;
+    public void setParameters(TypeParameterizedDoc[] parameters) {
+        this.parameters = parameters;
     }
 
     public Set<String> getLimits() {
@@ -70,7 +70,6 @@ public class TypeDoc extends AbsDocVO {
     public void setLimits(Set<String> limits) {
         this.limits = limits;
     }
-
 
     public void addLimit(String limit) {
         addLimits(Arrays.asList(limit));

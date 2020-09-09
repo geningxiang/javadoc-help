@@ -1,15 +1,13 @@
 package org.genx.javadoc.plugin.springmvc;
 
 import org.apache.commons.lang3.StringUtils;
+import org.genx.javadoc.bean.*;
+import org.genx.javadoc.bean.rest.RestInterfaceDoc;
+import org.genx.javadoc.bean.rest.RestNestTypeDoc;
 import org.genx.javadoc.plugin.IRestApiPlugin;
 import org.genx.javadoc.utils.DetailedTypeUtil;
-import org.genx.javadoc.vo.*;
-import org.genx.javadoc.vo.rest.RestInterfaceDoc;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,17 +23,35 @@ public class SpringMVCPlugin implements IRestApiPlugin {
 
     private static final String RESPONSE_BODY = "org.springframework.web.bind.annotation.ResponseBody";
 
-
     private static final String REQUEST_MAPPING = "org.springframework.web.bind.annotation.RequestMapping";
 
+    private static final String PATH_VARIABLE = "org.springframework.web.bind.annotation.PathVariable";
+
+    private static final String REQUEST_HEADER = "org.springframework.web.bind.annotation.RequestHeader";
+
+    private static final String REQUEST_BODY = "org.springframework.web.bind.annotation.RequestBody";
+
+    private static final String REQUEST_PARAM = "org.springframework.web.bind.annotation.RequestParam";
+
+    private static Map<String, String> METHOD_MAP = new HashMap(8);
+
+    static {
+        METHOD_MAP.put(REQUEST_MAPPING, null);
+        METHOD_MAP.put("org.springframework.web.bind.annotation.GetMapping", "GET");
+        METHOD_MAP.put("org.springframework.web.bind.annotation.PostMapping", "POST");
+        METHOD_MAP.put("org.springframework.web.bind.annotation.PutMapping", "PUT");
+        METHOD_MAP.put("org.springframework.web.bind.annotation.DeleteMapping", "DELETE");
+        METHOD_MAP.put("org.springframework.web.bind.annotation.PatchMapping", "PATCH");
+    }
+
     @Override
-    public List<RestInterfaceDoc> analysis(JavaDocVO javaDoc) {
+    public List<RestInterfaceDoc> analysis(JavaDoc javaDoc) {
         List<RestInterfaceDoc> result = new ArrayList(1024);
         List<RestInterfaceDoc> list;
 
         DetailedTypeUtil detailedTypeUtil = new DetailedTypeUtil(javaDoc);
 
-        for (ClassDocVO classDoc : javaDoc.getClassDocs().values()) {
+        for (ClassDoc classDoc : javaDoc.getClassDocs().values()) {
             list = analysis(classDoc, detailedTypeUtil);
             if (list != null) {
                 result.addAll(list);
@@ -45,14 +61,14 @@ public class SpringMVCPlugin implements IRestApiPlugin {
     }
 
 
-    public List<RestInterfaceDoc> analysis(ClassDocVO classDoc, DetailedTypeUtil detailedTypeUtil) {
+    public List<RestInterfaceDoc> analysis(ClassDoc classDoc, DetailedTypeUtil detailedTypeUtil) {
         if (!classDoc.hasAnnotation(REST_CONTROLLER)
                 && !classDoc.hasAnnotation(CONTROLLER)) {
             return null;
         }
         List<RestInterfaceDoc> list = new ArrayList(16);
         RestInterfaceDoc restInterfaceDoc;
-        for (MethodDocVO method : classDoc.getMethods()) {
+        for (MethodDoc method : classDoc.getMethods().values()) {
             restInterfaceDoc = analysis(classDoc, method, detailedTypeUtil);
             if (restInterfaceDoc != null) {
                 list.add(restInterfaceDoc);
@@ -63,7 +79,7 @@ public class SpringMVCPlugin implements IRestApiPlugin {
 
     }
 
-    private RestInterfaceDoc analysis(ClassDocVO classDoc, MethodDocVO methodDoc, DetailedTypeUtil detailedTypeUtil) {
+    private RestInterfaceDoc analysis(ClassDoc classDoc, MethodDoc methodDoc, DetailedTypeUtil detailedTypeUtil) {
         if (isRequestMapping(classDoc, methodDoc)) {
             String[] paths = readPaths(classDoc, methodDoc);
             if (paths != null && paths.length > 0) {
@@ -73,18 +89,11 @@ public class SpringMVCPlugin implements IRestApiPlugin {
         return null;
     }
 
-    private boolean isRequestMapping(ClassDocVO classDoc, MethodDocVO methodDoc) {
+    private boolean isRequestMapping(ClassDoc classDoc, MethodDoc methodDoc) {
         if (classDoc.hasAnnotation(REST_CONTROLLER)
                 || (classDoc.hasAnnotation(CONTROLLER) && methodDoc.hasAnnotation(RESPONSE_BODY))) {
-            LinkedHashMap<String, String> map = new LinkedHashMap(8);
-            map.put(REQUEST_MAPPING, null);
-            map.put("org.springframework.web.bind.annotation.GetMapping", "GET");
-            map.put("org.springframework.web.bind.annotation.PostMapping", "POST");
-            map.put("org.springframework.web.bind.annotation.PutMapping", "PUT");
-            map.put("org.springframework.web.bind.annotation.DeleteMapping", "DELETE");
-            map.put("org.springframework.web.bind.annotation.PatchMapping", "PATCH");
-            AnnotationDocVO result;
-            for (Map.Entry<String, String> entry : map.entrySet()) {
+            AnnotationDesc result;
+            for (Map.Entry<String, String> entry : METHOD_MAP.entrySet()) {
                 result = methodDoc.getAnnotation(entry.getKey());
                 if (result != null) {
                     if (StringUtils.isNotBlank(entry.getValue())) {
@@ -118,7 +127,7 @@ public class SpringMVCPlugin implements IRestApiPlugin {
         return result;
     }
 
-    private RestInterfaceDoc analysis(String[] urls, ClassDocVO classDocVO, MethodDocVO methodDocVO, DetailedTypeUtil detailedTypeUtil) {
+    private RestInterfaceDoc analysis(String[] urls, ClassDoc classDocVO, MethodDoc methodDocVO, DetailedTypeUtil detailedTypeUtil) {
         RestInterfaceDoc doc = new RestInterfaceDoc();
         doc.setUrl(urls[0]);
         doc.setUrls(urls);
@@ -130,16 +139,24 @@ public class SpringMVCPlugin implements IRestApiPlugin {
         if (methodDocVO.getParams() != null && methodDocVO.getParams().size() > 0) {
             List<TypeDoc> methodParams = filterMethodParams(methodDocVO.getParams());
 
-            List<DetailedTypeDoc> params = new ArrayList(methodDocVO.getParams().size());
-
             for (TypeDoc param : methodParams) {
-                params.add(detailedTypeUtil.analysis(param));
+
+                RestNestTypeDoc restTypeDoc = detailedTypeUtil.analysis(param);
+
+                if (param.hasAnnotation(PATH_VARIABLE)) {
+                    doc.addPathVariable(restTypeDoc.getName(), restTypeDoc);
+                } else if (param.hasAnnotation(REQUEST_HEADER)) {
+                    doc.addHeader(restTypeDoc.getName(), restTypeDoc);
+                } else if (param.hasAnnotation(REQUEST_BODY)) {
+                    doc.addBody(restTypeDoc.getName(), restTypeDoc);
+                } else {
+                    doc.addParam(restTypeDoc.getName(), restTypeDoc);
+                }
             }
-            doc.setParams(params);
         }
 
         doc.setReturnBody(detailedTypeUtil.analysis(methodDocVO.getReturnType()));
-        if(doc.getReturnBody() != null){
+        if (doc.getReturnBody() != null) {
             //删除 method 返回的类型第一级的注释
             doc.getReturnBody().setComment(null);
         }
@@ -147,8 +164,8 @@ public class SpringMVCPlugin implements IRestApiPlugin {
         return doc;
     }
 
-    public String readName(MethodDocVO methodDocVO) {
-        AnnotationDocVO annotationVO = methodDocVO.getAnnotation(REQUEST_MAPPING);
+    public String readName(MethodDoc methodDocVO) {
+        AnnotationDesc annotationVO = methodDocVO.getAnnotation(REQUEST_MAPPING);
         if (annotationVO != null) {
             String[] names = annotationVO.getValues("name");
             if (names != null && names.length > 0) {
@@ -158,8 +175,9 @@ public class SpringMVCPlugin implements IRestApiPlugin {
         return "";
     }
 
-    public String[] readMethods(MethodDocVO methodDocVO) {
-        AnnotationDocVO annotationVO = methodDocVO.getAnnotation(REQUEST_MAPPING);
+    public String[] readMethods(MethodDoc methodDocVO) {
+        AnnotationDesc annotationVO = methodDocVO.getAnnotation(REQUEST_MAPPING);
+        Set<String> methods = new HashSet();
         if (annotationVO != null) {
             String[] values = annotationVO.getValues("method");
             if (values != null) {
@@ -167,17 +185,21 @@ public class SpringMVCPlugin implements IRestApiPlugin {
                 for (int i = 0; i < values.length; i++) {
                     //org.springframework.web.bind.annotation.RequestMethod.GET 去掉前缀
                     if ((index = values[i].lastIndexOf(".")) > -1) {
-                        values[i] = values[i].substring(index + 1);
+                        methods.add(values[i].substring(index + 1));
                     }
                 }
-                return values;
             }
         }
-        return null;
+        for (Map.Entry<String, String> entry : METHOD_MAP.entrySet()) {
+            if (StringUtils.isNotBlank(entry.getValue()) && methodDocVO.hasAnnotation(entry.getKey())) {
+                methods.add(entry.getValue());
+            }
+        }
+        return methods.toArray(new String[0]);
     }
 
-    public String readProduces(MethodDocVO methodDocVO) {
-        AnnotationDocVO annotationVO = methodDocVO.getAnnotation(REQUEST_MAPPING);
+    public String readProduces(MethodDoc methodDocVO) {
+        AnnotationDesc annotationVO = methodDocVO.getAnnotation(REQUEST_MAPPING);
         if (annotationVO != null) {
             String[] values = annotationVO.getValues("produces");
             if (values != null) {
@@ -188,14 +210,14 @@ public class SpringMVCPlugin implements IRestApiPlugin {
     }
 
 
-    private String[] readPaths(ClassDocVO classDocVO, MethodDocVO methodDocVO) {
+    private String[] readPaths(ClassDoc classDocVO, MethodDoc methodDocVO) {
         String[] classRestPaths = null;
-        AnnotationDocVO classRequestMapping = readRequestMapping(classDocVO);
+        AnnotationDesc classRequestMapping = readRequestMapping(classDocVO);
         if (classRequestMapping != null) {
             classRestPaths = classRequestMapping.getValues("value");
         }
 
-        AnnotationDocVO methodRequestMapping = readRequestMapping(methodDocVO);
+        AnnotationDesc methodRequestMapping = readRequestMapping(methodDocVO);
 
         String[] methodRestPaths = null;
         if (methodRequestMapping != null) {
@@ -205,8 +227,7 @@ public class SpringMVCPlugin implements IRestApiPlugin {
         return composePath(classRestPaths, methodRestPaths);
     }
 
-    private AnnotationDocVO readRequestMapping(AbsDocVO item) {
-
+    private AnnotationDesc readRequestMapping(AbsDoc item) {
         LinkedHashMap<String, String> map = new LinkedHashMap(8);
         map.put(REQUEST_MAPPING, null);
         map.put("org.springframework.web.bind.annotation.GetMapping", "GET");
@@ -214,8 +235,7 @@ public class SpringMVCPlugin implements IRestApiPlugin {
         map.put("org.springframework.web.bind.annotation.PutMapping", "PUT");
         map.put("org.springframework.web.bind.annotation.DeleteMapping", "DELETE");
         map.put("org.springframework.web.bind.annotation.PatchMapping", "PATCH");
-
-        AnnotationDocVO result = null;
+        AnnotationDesc result = null;
         for (Map.Entry<String, String> entry : map.entrySet()) {
             result = item.getAnnotation(entry.getKey());
             if (result != null) {

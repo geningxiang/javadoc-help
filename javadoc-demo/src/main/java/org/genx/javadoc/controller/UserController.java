@@ -15,7 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,8 +31,8 @@ public class UserController {
 
     /**
      * 用户登录
-     * @param userName 用户名
-     * @param passWord 密码
+     * @param userName 用户名 {@link User#getUserName()}
+     * @param passWord 密码 {@link User#getPassWord()}
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public ResponseEntity<User> login(
@@ -41,12 +42,9 @@ public class UserController {
             @NotBlank
             @Pattern(regexp = "/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,10}$/", message = "密码必须是6~10位数字和字母的组合")
                     String passWord) {
-
-        ResponseEntity responseEntity = new ResponseEntity<User>();
-        responseEntity.setCode(200);
-        responseEntity.setData(new User());
-        return responseEntity;
+        return null;
     }
+
 
     /**
      * 用户登录 - 对象接收参数
@@ -110,5 +108,15 @@ public class UserController {
     public ResponseEntity<List<User>> friends(String userToken) {
         return null;
     }
+
+    /**
+     * 根据用户ID 查询
+     * @param userIds
+     */
+    @RequestMapping(value = "/queryByIds", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public ResponseEntity<List<User>> queryByIds(Integer... userIds) {
+        return null;
+    }
+
 }
 

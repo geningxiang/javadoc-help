@@ -1,9 +1,8 @@
 package org.genx.javadoc.utils;
 
-import com.sun.javadoc.ClassDoc;
+import org.genx.javadoc.bean.ClassDoc;
+import org.genx.javadoc.bean.JavaDoc;
 import org.genx.javadoc.plugin.JavaDocPluginManager;
-import org.genx.javadoc.vo.ClassDocVO;
-import org.genx.javadoc.vo.JavaDocVO;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,54 +15,65 @@ import java.util.Map;
  */
 public class JavaDocBuilder {
 
-
     private JavaDocEnv env = new JavaDocEnv();
 
-    public JavaDocBuilder read(ClassDoc[] classes) {
-        for (ClassDoc classDoc : classes) {
+
+    public JavaDocBuilder(com.sun.javadoc.ClassDoc[] classDocs) {
+        for (com.sun.javadoc.ClassDoc classDoc : classDocs) {
             env.classDocMap.put(classDoc.qualifiedTypeName(), classDoc);
         }
-        return this;
+
     }
 
-    public JavaDocVO build() {
-        new ClassReader(env).read(env.classDocMap.values());
-        JavaDocVO javaDocVO = new JavaDocVO();
-        javaDocVO.setClassDocs(env.classDocs);
-        javaDocVO.setIncludeClassDocs(env.includes);
 
-        JavaDocPluginManager.handle(javaDocVO);
+    public JavaDoc build() {
+        new ClassReader(env).read();
 
-        return javaDocVO;
+        JavaDoc javaDoc = new JavaDoc();
+        javaDoc.setClassDocs(env.classDocs);
+        javaDoc.setIncludeClassDocs(env.includes);
+
+        //运行插件
+        JavaDocPluginManager.handle(javaDoc);
+
+        return javaDoc;
     }
 
 
     class JavaDocEnv {
-        private Map<String, ClassDoc> classDocMap = new HashMap(2048);
+        private Map<String, com.sun.javadoc.ClassDoc> classDocMap = new HashMap(2048);
 
         /**
          * 源码的类
          */
-        private Map<String, ClassDocVO> classDocs = new HashMap(2048);
+        private Map<String, ClassDoc> classDocs = new HashMap(2048);
 
         /**
          * 外部引用
          */
-        private Map<String, ClassDocVO> includes = new HashMap(2048);
+        private Map<String, ClassDoc> includes = new HashMap(2048);
+
+        public Map<String, com.sun.javadoc.ClassDoc> getClassDocMap() {
+            return classDocMap;
+        }
 
         private boolean isBase(String className) {
             return classDocMap.containsKey(className);
         }
 
-        public boolean exist(String className) {
-            return classDocs.containsKey(className) || includes.containsKey(className);
+        public ClassDoc get(String className) {
+            ClassDoc classDoc = classDocs.get(className);
+            if (classDoc == null) {
+                classDoc = includes.get(className);
+            }
+            return classDoc;
         }
 
-        public void add(ClassDocVO classDocVO) {
-            if (isBase(classDocVO.getClassName())) {
-                classDocs.put(classDocVO.getClassName(), classDocVO);
+        public void add(ClassDoc classDoc) {
+            if (isBase(classDoc.getClassName())) {
+                classDocs.put(classDoc.getClassName(), classDoc);
             } else {
-                includes.put(classDocVO.getClassName(), classDocVO);
+                includes.put(classDoc.getClassName(), classDoc);
             }
 
         }

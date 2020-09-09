@@ -1,8 +1,7 @@
 package org.genx.javadoc.plugin.swagger;
 
-import org.apache.commons.lang3.StringUtils;
+import org.genx.javadoc.bean.*;
 import org.genx.javadoc.plugin.IJavaDocPlugin;
-import org.genx.javadoc.vo.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,15 +17,15 @@ public class SwaggerPlugin implements IJavaDocPlugin {
     private final String API_OPERATION = "io.swagger.annotations.ApiOperation";
 
     @Override
-    public void handle(JavaDocVO javaDocVO) {
-        for (ClassDocVO classDoc : javaDocVO.getClassDocs().values()) {
+    public void handle(JavaDoc javaDocVO) {
+        for (ClassDoc classDoc : javaDocVO.getClassDocs().values()) {
             handle(classDoc);
         }
     }
 
-    public void handle(ClassDocVO classDoc) {
-        AnnotationDocVO annotationDocVO;
-        for (TypeDoc field : classDoc.getFields()) {
+    public void handle(ClassDoc classDoc) {
+        AnnotationDesc annotationDocVO;
+        for (TypeDoc field : classDoc.getFields().values()) {
             annotationDocVO = field.getAnnotation(API_MODEL_PROPERTY);
             if (annotationDocVO != null) {
 
@@ -34,8 +33,8 @@ public class SwaggerPlugin implements IJavaDocPlugin {
 
                 boolean required = "true".equals(annotationDocVO.getValue("required"));
 
-                if (StringUtils.isBlank(field.getComment())) {
-                    field.setComment(comment);
+                if (field.getComment() == null) {
+                    field.setComment(CommentDoc.of(comment));
                 }
 
                 if (required) {
@@ -44,12 +43,12 @@ public class SwaggerPlugin implements IJavaDocPlugin {
             }
         }
 
-        for (MethodDocVO method : classDoc.getMethods()) {
+        for (MethodDoc method : classDoc.getMethods().values()) {
             annotationDocVO = method.getAnnotation(API_OPERATION);
             if (annotationDocVO != null) {
                 String comment = annotationDocVO.getValue("value");
-                if (StringUtils.isBlank(method.getComment())) {
-                    method.setComment(comment);
+                if (method.getComment() == null) {
+                    method.setComment(CommentDoc.of(comment));
                 }
             }
         }

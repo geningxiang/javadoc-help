@@ -1,44 +1,40 @@
-package org.genx.javadoc.vo.rest;
+package org.genx.javadoc.bean.rest;
+
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
  * Description: 
  * @author genx
- * @date 2020/3/1 16:02
+ * @date 2020/9/5 21:57
  */
 public class RestApiDoc {
 
-    /**
-     * 各个环境的 基础地址
-     */
     private Map<String, String> baseUrls = new HashMap(8);
 
-
-    private List<RestInterfaceDoc> interfaces;
-
+    private Map<String, RestInterfaceDoc> interfaces;
 
     public Map<String, String> getBaseUrls() {
         return baseUrls;
     }
 
     public void setBaseUrls(Map<String, String> baseUrls) {
-        this.baseUrls = baseUrls;
+        if (baseUrls != null) {
+            this.baseUrls.putAll(baseUrls);
+        }
     }
 
     public void setBaseUrl(String profile, String baseUrl) {
         this.baseUrls.put(profile, baseUrl);
     }
 
-
-    public List<RestInterfaceDoc> getInterfaces() {
+    public Map<String, RestInterfaceDoc> getInterfaces() {
         return interfaces;
     }
 
-    public void setInterfaces(List<RestInterfaceDoc> interfaces) {
+    public void setInterfaces(Map<String, RestInterfaceDoc> interfaces) {
         this.interfaces = interfaces;
     }
 }

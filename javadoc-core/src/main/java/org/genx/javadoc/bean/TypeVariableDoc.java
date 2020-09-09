@@ -1,4 +1,6 @@
-package org.genx.javadoc.vo;
+package org.genx.javadoc.bean;
+
+import java.io.Serializable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -6,7 +8,7 @@ package org.genx.javadoc.vo;
  * @author genx
  * @date 2020/2/15 16:32
  */
-public class TypeVariableVO {
+public class TypeVariableDoc implements Serializable {
 
     /**
      * 泛型名称
@@ -16,7 +18,7 @@ public class TypeVariableVO {
 
     /**
      * 描述
-     * K extends java.io.Serializable
+     * 例如: K extends java.io.Serializable
      */
     private String description;
 

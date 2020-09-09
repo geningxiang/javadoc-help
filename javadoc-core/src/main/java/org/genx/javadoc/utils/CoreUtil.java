@@ -1,9 +1,10 @@
 package org.genx.javadoc.utils;
 
-import com.sun.javadoc.*;
 import org.apache.commons.lang3.StringUtils;
+import org.genx.javadoc.bean.ClassDoc;
+import org.genx.javadoc.bean.TypeDoc;
+import org.genx.javadoc.bean.TypeParameterizedDoc;
 import org.genx.javadoc.contants.RoughlyType;
-import org.genx.javadoc.vo.TypeParameterizedDoc;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,136 +45,85 @@ public class CoreUtil {
      * @return
      */
     public static boolean isIterable(ClassDoc classDoc) {
-        if (classDoc != null && classDoc.interfaces() != null) {
-            for (ClassDoc i : classDoc.interfaces()) {
-                if (ITERABLE.equals(i.qualifiedName())) {
-                    //如果实现了 java.lang.Iterable 接口 则认为是 可迭代的
-                    return true;
-                } else {
-                    return isIterable(i);
-                }
-            }
+        if (classDoc != null) {
+            return classDoc.getInterfaceTypes().contains(ITERABLE);
         }
         return false;
     }
 
-    public static boolean isMap(com.sun.javadoc.Type type) {
-        if (type.asClassDoc() != null && type.asClassDoc() != null && type.asClassDoc().interfaces() != null) {
-            for (ClassDoc i : type.asClassDoc().interfaces()) {
-                if (MAP.equals(i.qualifiedName())) {
-                    return true;
-                } else {
-                    return isIterable(i);
-                }
-            }
+    public static boolean isMap(ClassDoc classDoc) {
+        if (classDoc != null) {
+            return classDoc.getInterfaceTypes().contains(MAP);
         }
         return false;
     }
 
 
     public static boolean isNumber(ClassDoc classDoc) {
-        while (classDoc != null) {
-            if (NUMBER.equals(classDoc.qualifiedTypeName())) {
-                return true;
-            }
-            classDoc = classDoc.superclass();
+        if (classDoc != null) {
+            return classDoc.getInterfaceTypes().contains(NUMBER);
         }
         return false;
     }
 
     public static boolean isString(ClassDoc classDoc) {
-        if (classDoc != null && classDoc.interfaces() != null) {
-            for (ClassDoc i : classDoc.interfaces()) {
-                if (CHAR_SEQUENCE.equals(i.qualifiedName())) {
-                    return true;
-                } else {
-                    return isString(i);
-                }
-            }
+        if (classDoc != null) {
+            return classDoc.getInterfaceTypes().contains(CHAR_SEQUENCE);
         }
         return false;
     }
 
     public static boolean isDate(ClassDoc classDoc) {
-        while (classDoc != null) {
-            if (DATE.equals(classDoc.qualifiedTypeName())) {
-                return true;
-            }
-            classDoc = classDoc.superclass();
+        if (classDoc != null) {
+            //TODO 要不要在 classDoc上加上父类 信息
+            //Date不是接口  也没有标记父类， 只好先判断一下方法
+            return classDoc.getMethods().containsKey("before(java.util.Date)") && classDoc.getMethods().containsKey("after(java.util.Date)");
         }
         return false;
     }
 
-    public static RoughlyType assertType(com.sun.javadoc.Type type) {
-        //基础类型判断
-        RoughlyType roughlyType = RoughlyType.assertBaseType(type.qualifiedTypeName());
-        if (roughlyType != null) {
-            return roughlyType;
-        }
-        if(type.asClassDoc() != null){
-            return assertType(type.asClassDoc());
-        }
-        return RoughlyType.Unknow;
-    }
-
     public static RoughlyType assertType(ClassDoc classDoc) {
         //基础类型判断
-        RoughlyType roughlyType = RoughlyType.assertBaseType(classDoc.qualifiedTypeName());
+        RoughlyType roughlyType = RoughlyType.assertBaseType(classDoc.getClassName());
         if (roughlyType != null) {
             return roughlyType;
         }
-        if (isIterable(classDoc.asClassDoc())) {
+        if (isIterable(classDoc)) {
             return RoughlyType.Array;
         }
-        if (isMap(classDoc.asClassDoc())) {
+        if (isMap(classDoc)) {
             return RoughlyType.Map;
         }
-        if (isNumber(classDoc.asClassDoc())) {
+        if (isNumber(classDoc)) {
             return RoughlyType.Number;
         }
-        if (isString(classDoc.asClassDoc())) {
+        if (isString(classDoc)) {
             return RoughlyType.String;
         }
-        if (isDate(classDoc.asClassDoc())) {
+        if (isDate(classDoc)) {
             return RoughlyType.Date;
         }
         return RoughlyType.Object;
     }
 
-    public static Map<String, String> readTagMap(Doc type) {
-        if (type.tags() != null && type.tags().length > 0) {
-            Map<String, String> tagMap = new HashMap(16);
-            String tmp;
-            for (Tag tag : type.tags()) {
-                tmp = tagMap.get(tag.name());
-                if (StringUtils.isNotBlank(tmp)) {
-                    tmp = tmp + System.lineSeparator() + tag.text();
-                } else {
-                    tmp = tag.text();
-                }
-                tagMap.put(tag.name(), tmp);
-            }
-            return tagMap;
-        }
-        return null;
-    }
 
     /**
      * 读取指定的泛型
      * @param type
      * @return
      */
-    public static TypeParameterizedDoc[] readParameteres(Type type) {
+    public static TypeParameterizedDoc[] readParameteres(com.sun.javadoc.Type type) {
         if (type.asParameterizedType() != null) {
             TypeParameterizedDoc[] array = new TypeParameterizedDoc[type.asParameterizedType().typeArguments().length];
-            Type item;
+            com.sun.javadoc.Type item;
             for (int i = 0; i < type.asParameterizedType().typeArguments().length; i++) {
                 item = type.asParameterizedType().typeArguments()[i];
                 TypeParameterizedDoc typeParameterizedDoc = new TypeParameterizedDoc();
                 typeParameterizedDoc.setText(item.toString());
                 typeParameterizedDoc.setClassName(item.qualifiedTypeName());
+                // item.dimension() 返回 "" "[]" "[][]"
                 typeParameterizedDoc.setDimension(item.dimension().length() / 2 + 1);
-                typeParameterizedDoc.setParameteres(readParameteres(item));
+                typeParameterizedDoc.setParameters(readParameteres(item));
                 array[i] = typeParameterizedDoc;
             }
             return array;
@@ -187,15 +137,15 @@ public class CoreUtil {
      * @param methodDoc
      * @return
      */
-    public static Map<String, String> readThrowExpections(MethodDoc methodDoc) {
+    public static Map<String, String> readThrowExpections(com.sun.javadoc.MethodDoc methodDoc) {
         Map<String, String> throwExpections = new HashMap(8);
         if (methodDoc.thrownExceptions() != null) {
-            for (ClassDoc classDoc : methodDoc.thrownExceptions()) {
+            for (com.sun.javadoc.ClassDoc classDoc : methodDoc.thrownExceptions()) {
                 throwExpections.put(classDoc.qualifiedTypeName(), "");
             }
         }
 
-        for (ThrowsTag throwsTag : methodDoc.throwsTags()) {
+        for (com.sun.javadoc.ThrowsTag throwsTag : methodDoc.throwsTags()) {
             if (throwsTag.exceptionType() != null) {
                 throwExpections.put(throwsTag.exceptionType().qualifiedTypeName(), throwsTag.exceptionComment());
             }

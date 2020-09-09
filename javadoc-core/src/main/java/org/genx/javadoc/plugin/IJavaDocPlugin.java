@@ -1,7 +1,6 @@
 package org.genx.javadoc.plugin;
 
-import org.genx.javadoc.vo.ClassDocVO;
-import org.genx.javadoc.vo.JavaDocVO;
+import org.genx.javadoc.bean.JavaDoc;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,6 +18,6 @@ public interface IJavaDocPlugin {
         return 0;
     }
 
-    void handle(JavaDocVO javaDocVO);
+    void handle(JavaDoc javaDocVO);
 
 }

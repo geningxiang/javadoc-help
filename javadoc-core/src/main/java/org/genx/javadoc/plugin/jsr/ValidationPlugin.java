@@ -1,8 +1,8 @@
 package org.genx.javadoc.plugin.jsr;
 
 import org.apache.commons.lang3.StringUtils;
+import org.genx.javadoc.bean.*;
 import org.genx.javadoc.plugin.IJavaDocPlugin;
-import org.genx.javadoc.vo.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -69,19 +69,21 @@ public class ValidationPlugin implements IJavaDocPlugin {
     private final String ORG_HIBERNATE_VALIDATOR = "org.hibernate.validator.constraints.";
 
     @Override
-    public void handle(JavaDocVO javaDocVO) {
+    public void handle(JavaDoc javaDocVO) {
         Set<String> limits;
-        for (ClassDocVO classDoc : javaDocVO.getClassDocs().values()) {
+        for (ClassDoc classDoc : javaDocVO.getClassDocs().values()) {
 
-            for (TypeDoc field : classDoc.getFields()) {
+            for (TypeDoc field : classDoc.getFields().values()) {
+                //字段上的注解
                 limits = readValidAnnoaation(field);
                 if (limits != null) {
                     field.addLimits(limits);
                 }
             }
 
-            for (MethodDocVO method : classDoc.getMethods()) {
+            for (MethodDoc method : classDoc.getMethods().values()) {
                 if (method.getReturnType() != null) {
+                    //方法上的注解
                     limits = readValidAnnoaation(method);
                     if (limits != null) {
                         method.getReturnType().addLimits(limits);
@@ -102,12 +104,12 @@ public class ValidationPlugin implements IJavaDocPlugin {
 
     }
 
-    public Set<String> readValidAnnoaation(AbsDocVO doc) {
+    public Set<String> readValidAnnoaation(TypeDoc doc) {
         if (doc != null && doc.getAnnotations() != null) {
             Set<String> set = new HashSet();
-            for (AnnotationDocVO annotation : doc.getAnnotations().values()) {
+            for (AnnotationDesc annotation : doc.getAnnotations().values()) {
 
-                if (annotation.getClassName().startsWith(JAVAX_VALIDATION) || annotation.getClassName().startsWith(ORG_HIBERNATE_VALIDATOR)) {
+                if (annotation.getQualifiedName().startsWith(JAVAX_VALIDATION) || annotation.getQualifiedName().startsWith(ORG_HIBERNATE_VALIDATOR)) {
                     try {
                         ValidAnnotation validAnnotation = ValidAnnotation.valueOf(annotation.getName());
                         if (validAnnotation != null) {
@@ -117,17 +119,36 @@ public class ValidationPlugin implements IJavaDocPlugin {
                         //未定义在 ValidAnnotation 枚举中
                         set.add(annotation.getText());
                     }
-
                 }
-
-
             }
             return set;
         }
         return null;
     }
 
-    private String parse(ValidAnnotation validAnnotation, AnnotationDocVO annotation) {
+    public Set<String> readValidAnnoaation(MethodDoc doc) {
+        if (doc != null && doc.getAnnotations() != null) {
+            Set<String> set = new HashSet();
+            for (AnnotationDesc annotation : doc.getAnnotations().values()) {
+
+                if (annotation.getQualifiedName().startsWith(JAVAX_VALIDATION) || annotation.getQualifiedName().startsWith(ORG_HIBERNATE_VALIDATOR)) {
+                    try {
+                        ValidAnnotation validAnnotation = ValidAnnotation.valueOf(annotation.getName());
+                        if (validAnnotation != null) {
+                            set.add(parse(validAnnotation, annotation));
+                        }
+                    } catch (IllegalArgumentException e) {
+                        //未定义在 ValidAnnotation 枚举中
+                        set.add(annotation.getText());
+                    }
+                }
+            }
+            return set;
+        }
+        return null;
+    }
+
+    private String parse(ValidAnnotation validAnnotation, AnnotationDesc annotation) {
         StringBuilder sb = new StringBuilder();
         sb.append(validAnnotation.getName());
         if (validAnnotation.getKeys() != null && validAnnotation.getKeys().length > 0) {

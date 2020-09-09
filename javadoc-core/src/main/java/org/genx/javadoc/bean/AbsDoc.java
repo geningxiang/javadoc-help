@@ -1,17 +1,17 @@
-package org.genx.javadoc.vo;
+package org.genx.javadoc.bean;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
  * Description: 
  * @author genx
- * @date 2020/3/5 21:23
+ * @date 2020/9/5 9:01
  */
-public abstract class AbsDocVO {
-
+public abstract class AbsDoc implements Serializable {
 
     /**
      * 类名
@@ -26,26 +26,24 @@ public abstract class AbsDocVO {
     /**
      * 修饰符数值
      */
-    private int modifierSpecifier;
+    protected int modifierSpecifier;
 
     /**
      * 注解
      * key 注解的类名
      */
-    protected Map<String, AnnotationDocVO> annotations;
+    protected Map<String, AnnotationDesc> annotations;
 
     /**
-     * 注释 带换行符的
+     * 注释
      */
-    protected String comment;
+    protected CommentDoc comment;
 
     /**
      * 注释标签
      * 例如 @ param
      */
-    protected Map<String, String> tags;
-
-
+    protected Map<String, CommentDoc> tags;
 
     public String getClassName() {
         return className;
@@ -63,19 +61,43 @@ public abstract class AbsDocVO {
         this.classInfo = classInfo;
     }
 
-    public Map<String, AnnotationDocVO> getAnnotations() {
+    public int getModifierSpecifier() {
+        return modifierSpecifier;
+    }
+
+    public void setModifierSpecifier(int modifierSpecifier) {
+        this.modifierSpecifier = modifierSpecifier;
+    }
+
+    public Map<String, AnnotationDesc> getAnnotations() {
         return annotations;
     }
 
-    public void setAnnotations(Map<String, AnnotationDocVO> annotations) {
+    public void setAnnotations(Map<String, AnnotationDesc> annotations) {
         this.annotations = annotations;
+    }
+
+    public CommentDoc getComment() {
+        return comment;
+    }
+
+    public void setComment(CommentDoc comment) {
+        this.comment = comment;
+    }
+
+    public Map<String, CommentDoc> getTags() {
+        return tags;
+    }
+
+    public void setTags(Map<String, CommentDoc> tags) {
+        this.tags = tags;
     }
 
     public boolean hasAnnotation(String annotationClassName) {
         return StringUtils.isNotBlank(annotationClassName) && annotations != null && annotations.containsKey(annotationClassName);
     }
 
-    public AnnotationDocVO getAnnotation(String annotationClassName) {
+    public AnnotationDesc getAnnotation(String annotationClassName) {
         if (StringUtils.isNotBlank(annotationClassName) && this.annotations != null) {
             return this.annotations.get(annotationClassName);
         }
@@ -84,7 +106,7 @@ public abstract class AbsDocVO {
 
     public String getAnnotationValue(String annotationClassName, String key) {
         if (StringUtils.isNotBlank(annotationClassName) && this.annotations != null) {
-            AnnotationDocVO annotationDocVO = this.annotations.get(annotationClassName);
+            AnnotationDesc annotationDocVO = this.annotations.get(annotationClassName);
             return annotationDocVO.getValue(key);
         }
         return null;
@@ -92,43 +114,20 @@ public abstract class AbsDocVO {
 
     public String[] getAnnotationValues(String annotationClassName, String key) {
         if (StringUtils.isNotBlank(annotationClassName) && this.annotations != null) {
-            AnnotationDocVO annotationDocVO = this.annotations.get(annotationClassName);
+            AnnotationDesc annotationDocVO = this.annotations.get(annotationClassName);
             return annotationDocVO.getValues(key);
         }
         return null;
     }
 
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Map<String, String> getTags() {
-        return tags;
-    }
-
-    public String getTag(String tagKey) {
-        if(StringUtils.isBlank(tagKey) || this.tags == null){
-            return "";
+    public CommentDoc getTag(String tagKey) {
+        if (StringUtils.isBlank(tagKey) || this.tags == null) {
+            return null;
         }
         if (tagKey.charAt(0) != '@') {
             tagKey = "@" + tagKey;
         }
-        return StringUtils.trimToEmpty(this.tags.get(tagKey));
+        return this.tags.get(tagKey);
     }
 
-    public void setTags(Map<String, String> tags) {
-        this.tags = tags;
-    }
-
-    public int getModifierSpecifier() {
-        return modifierSpecifier;
-    }
-
-    public void setModifierSpecifier(int modifierSpecifier) {
-        this.modifierSpecifier = modifierSpecifier;
-    }
 }

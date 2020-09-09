@@ -10,10 +10,22 @@ import java.util.List;
 
 public class Page<T> {
 
-    private List<T> records;
-    private long total;
-    private long size;
+    /**
+     * 当前第几页
+     */
     private long current;
+    /**
+     * 总页数
+     */
+    private long total;
+    /**
+     * 每页条数
+     */
+    private long size;
+    /**
+     * 当前页数据列表
+     */
+    private List<T> records;
 
     private boolean optimizeCountSql;
     private boolean isSearchCount;

@@ -16,12 +16,14 @@ public class AppConfigure {
     private Integer id;
 
     /**
-     * 上级ID
+     * 上级ID {@link AppConfigure#id}  {@linkplain AppConfigure#id} 我是后面的注释
+     * @see AppConfigure#id {@link AppConfigure#id}
+     * @since 2.3.2
      */
     private Integer pid;
 
     /**
-     * 路径
+     * 路径 {@value "51231233"}
      */
     private Integer location;
 

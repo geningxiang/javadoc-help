@@ -1,26 +1,31 @@
-package org.genx.javadoc.vo;
+package org.genx.javadoc.bean;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
  * Description:
- *
- * @author: genx
- * @date: 2019/3/12 9:33
+ * TODO 是否需要把 一个注解继承的注解也读出来
+ * @author genx
+ * @date 2020/9/4 22:03
  */
-public class AnnotationDocVO {
+public class AnnotationDesc implements Serializable {
+
     private String name;
-    private String text;
     /**
      * 注解的类名
      * 例如 org.springframework.web.bind.annotation.RequestMapping
      */
-    private String className;
+    private String qualifiedName;
+
+    private String text;
+
     private Map<String, String[]> data;
+
 
     public String getName() {
         return name;
@@ -30,20 +35,12 @@ public class AnnotationDocVO {
         this.name = name;
     }
 
-    public String getText() {
-        return text;
+    public String getQualifiedName() {
+        return qualifiedName;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
+    public void setQualifiedName(String qualifiedName) {
+        this.qualifiedName = qualifiedName;
     }
 
     public Map<String, String[]> getData() {
@@ -52,14 +49,6 @@ public class AnnotationDocVO {
 
     public void setData(Map<String, String[]> data) {
         this.data = data;
-    }
-
-
-    public void setValue(String key, String... value) {
-        if(this.data == null){
-            this.data = new HashMap(8);
-        }
-        this.data.put(key, value);
     }
 
     public String getValue(String key) {
@@ -77,5 +66,18 @@ public class AnnotationDocVO {
         return null;
     }
 
+    public void setValue(String key, String... value) {
+        if(this.data == null){
+            this.data = new HashMap(8);
+        }
+        this.data.put(key, value);
+    }
 
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
 }

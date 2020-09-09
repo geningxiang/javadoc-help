@@ -6,6 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,7 +16,7 @@ import java.io.Serializable;
  * @date: 2019/3/13 23:32
  */
 @Data
-public class User implements Serializable {
+public class User implements Serializable, Comparator<User> {
     /**
      * ID
      */
@@ -38,6 +39,11 @@ public class User implements Serializable {
      * 用户令牌
      */
     private String userToken;
+
+    @Override
+    public int compare(User o1, User o2) {
+        return 0;
+    }
 
 
     static class UserBuilder {

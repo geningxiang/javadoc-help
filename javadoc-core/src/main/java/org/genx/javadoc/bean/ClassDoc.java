@@ -1,9 +1,6 @@
 package org.genx.javadoc.bean;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,12 +24,12 @@ public class ClassDoc extends AbsDoc {
     /**
      * 变量
      */
-    private Map<String, TypeDoc> fields = new TreeMap();
+    private Map<String, TypeDoc> fields = new LinkedHashMap();
 
     /**
      * 方法
      */
-    private Map<String, MethodDoc> methods = new TreeMap();
+    private Map<String, MethodDoc> methods = new LinkedHashMap();
 
     public List<TypeVariableDoc> getTypeParameters() {
         return typeParameters;

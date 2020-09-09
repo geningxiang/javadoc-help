@@ -16,11 +16,11 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
+import org.genx.javadoc.bean.JavaDoc;
+import org.genx.javadoc.bean.rest.RestApiDoc;
 import org.genx.javadoc.helper.RestApiBuilder;
 import org.genx.javadoc.utils.FileUtil;
 import org.genx.javadoc.utils.ZipUtil;
-import org.genx.javadoc.vo.JavaDocVO;
-import org.genx.javadoc.vo.rest.RestApiDoc;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -163,7 +163,7 @@ public class JavaDocMojo extends AbstractMojo {
             }
         }
 
-        JavaDocVO javaDocVO = JavaDocReader.read(sourceDirs, compilePath);
+        JavaDoc javaDocVO = JavaDocReader.read(sourceDirs, compilePath);
 
         File docDir = new File(target.getAbsolutePath() + "/docs");
         docDir.mkdirs();

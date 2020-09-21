@@ -78,11 +78,12 @@ public class DetailedTypeUtil {
             item.setDimension(itemParameterizedDoc.getDimension());
             item.setParameters(itemParameterizedDoc.getParameters());
             ClassDoc itemClassDoc = env.getClassDoc(itemParameterizedDoc.getClassName());
-            RoughlyType roughlyType =  CoreUtil.assertType(itemClassDoc);
-            if (itemClassDoc != null && RoughlyType.Object == roughlyType) {
-                analysisObject(item, itemClassDoc, resolvedMap);
+            if(itemClassDoc != null) {
+                RoughlyType roughlyType = CoreUtil.assertType(itemClassDoc);
+                if (RoughlyType.Object == roughlyType){
+                    analysisObject(item, itemClassDoc, resolvedMap);
+                }
             }
-
             restTypeDoc.setData(Arrays.asList(item));
         }
     }

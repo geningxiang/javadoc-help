@@ -22,7 +22,7 @@
 
         <!-- 自定义 版本参数 -->
         <spring.version>5.2.0.RELEASE</spring.version>
-        <fastjson.version>1.2.62</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <commons-lang3.version>3.9</commons-lang3.version>
         <commons-codec.version>1.11</commons-codec.version>
         <junit.version>4.12</junit.version>
